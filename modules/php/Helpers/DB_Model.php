@@ -1,5 +1,7 @@
 <?php
+
 namespace FOO\Helpers;
+
 use FOO\Core\Game;
 
 abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
@@ -41,7 +43,7 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
   }
 
   /**
-   * Get the DB primary row according to attributes mapping
+   * Get the DB primary row according to attributes mapping (property $this->primary in child class)
    */
   private function getPrimaryFieldValue()
   {
@@ -55,7 +57,16 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
   }
 
   /*
-   * Magic method that intercept not defined method and do the appropriate stuff
+   * Magic method that intercept not defined static method and do the appropriate stuff
+   * examples - Globals::getTurn() ,  Globals::setTurn(5) , Globals::incTurn()
+   * usage - the name of the method must follow this pattern :
+   *  - the operation or query to be excecuted (one of the following:  'get' or 'set' or 'inc' or 'is')
+   *  - the name of the variable with the first letter in uppercase
+   * Notes:
+   *  - the global variable cannot have multiple uppercase letters in its name (ex: 'firstPlayer' is ok, 'firstPlayerId' is not)
+   *  - you can use positive of negative arguments for 'inc' (ex: Globals::incTurn(-1) will decrease the turn by 1). when no argument is given, the increment is 1
+   *  - the 'is' operation is only for boolean variables
+   *  - the 'set' operation on int and bool variables will cast the argument to the appropriate type
    */
   public function __call($method, $args)
   {
@@ -139,7 +150,6 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
       }
     } else {
       throw new \feException('Undefined method ' . $method);
-      return null;
     }
   }
 
@@ -170,7 +180,12 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
     return $data;
   }
 
-  public function getUiData()
+  /**
+   * Returns an array of all attributes and their values, including static attributes, for UI data.
+   *
+   * @return array An array of all attributes and their values, including static attributes, for UI data.
+   */
+  public function getUiData(): array
   {
     return array_merge($this->jsonSerialize(), $this->getStaticData());
   }

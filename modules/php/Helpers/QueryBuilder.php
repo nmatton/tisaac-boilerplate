@@ -1,4 +1,5 @@
 <?php
+
 namespace FOO\Helpers;
 
 class QueryBuilder extends \APP_DbObject
@@ -21,6 +22,14 @@ class QueryBuilder extends \APP_DbObject
     $operation,
     $operationDatas;
 
+  /**
+   * Constructor for the QueryBuilder class.
+   *
+   * @param string $table The name of the table to query.
+   * @param mixed $cast The type to cast the query results to. Default is null.
+   * @param string $primary The name of the primary key column. Default is 'id'.
+   * @param bool $log Whether to enable logging. Default is false.
+   */
   public function __construct($table, $cast = null, $primary = 'id', $log = false)
   {
     $this->table = $table;
@@ -39,8 +48,12 @@ class QueryBuilder extends \APP_DbObject
   /*************************
    ********* INSERT *********
    *************************/
-  /*
+  /**
    * Single insert, array syntax is [ 'name_of_field' => $value, ... ]
+   * 
+   * @param array $fields The fields to insert.
+   * @param bool $overwriteIfExists Whether to overwrite the row if it already exists. Default is false.
+   * @return int The ID of the inserted row.
    */
   public function insert($fields = [], $overwriteIfExists = false)
   {
@@ -48,9 +61,13 @@ class QueryBuilder extends \APP_DbObject
     return self::DbGetLastId();
   }
 
-  /*
+  /**
    * Multiple insert, syntax is : ->multipleInsert(['field1', 'field2'])->values([ [1, 'test'], [2, 'tester'], ....])
    *   !!!! each values must have the content in same order as the fields
+   * 
+   * @param array $fields The fields to insert.
+   * @param bool $overwriteIfExists Whether to overwrite the row if it already exists. Default is false.
+   * @return QueryBuilder The QueryBuilder object.
    */
   public function multipleInsert($fields = [], $overwriteIfExists = false)
   {
@@ -60,6 +77,12 @@ class QueryBuilder extends \APP_DbObject
     return $this;
   }
 
+  /**
+   * Set the values for the query.
+   *
+   * @param array $rows The rows to be inserted or updated.
+   * @return array The IDs of the inserted or updated rows.
+   */
   public function values($rows = [])
   {
     // Fetch starting index if not provided
@@ -79,7 +102,7 @@ class QueryBuilder extends \APP_DbObject
       }
       $vals[] = '(' . implode(',', $rowValues) . ')';
       $ids[] =
-        $rom[$this->primary] ?? ($this->insertPrimaryIndex === false ? $startingId++ : $row[$this->insertPrimaryIndex]);
+        $row[$this->primary] ?? ($this->insertPrimaryIndex === false ? $startingId++ : $row[$this->insertPrimaryIndex]);
     }
 
     $this->sql .= implode(',', $vals);
@@ -100,6 +123,12 @@ class QueryBuilder extends \APP_DbObject
    ********************************/
 
   // Delete : optional parameter $id which add a where clause on primary key
+  /**
+   * 
+   * Delete a row from the table.
+   * @param int|null $id The ID of the row to delete (optional).
+   * @return QueryBuilder The QueryBuilder object.
+   */
   public function delete($id = null)
   {
     $this->sql = "DELETE FROM `{$this->table}`";
@@ -107,9 +136,13 @@ class QueryBuilder extends \APP_DbObject
     return isset($id) ? $this->run($id) : $this;
   }
 
-  /*
+  /**
    * Update: $fields array structure is the same as the one for insert
    *    optional parameter $id adds a where clause on primary key
+   * 
+   * @param array $fields The fields to update.
+   * @param int|null $id The ID of the row to update (optional).
+   * @return QueryBuilder The QueryBuilder object.
    */
   public function update($fields = [], $id = null)
   {
@@ -124,9 +157,13 @@ class QueryBuilder extends \APP_DbObject
     return isset($id) ? $this->run($id) : $this;
   }
 
-  /*
+  /**
    * Inc: $fields array structure is the same as the one for insert, but instead of value to be set,
    *    the array contains the offset
+   * 
+   * @param array $fields The fields to increment.
+   * @param int|null $id The ID of the row to increment (optional).
+   * @return QueryBuilder The QueryBuilder object.
    */
   public function inc($fields = [], $id = null)
   {
@@ -143,6 +180,12 @@ class QueryBuilder extends \APP_DbObject
 
   /*
    * Run a query
+   */
+  /**
+   * Run the query.
+   *
+   * @param int|null $id The ID parameter (optional).
+   * @return array The ids affected rows.
    */
   public function run($id = null)
   {
@@ -184,9 +227,12 @@ class QueryBuilder extends \APP_DbObject
    ********* SELECT QUERIES *********
    *********************************/
 
-  /*
+  /**
    * Select: fetch rows. Structure is columns is either an array with the name of columns you want to fetch,
    *    or an associative array [ 'alias' => 'fieldname'] if you want to use "AS"
+   * 
+   * @param mixed $columns The columns to fetch.
+   * @return QueryBuilder The QueryBuilder object.
    */
   public function select($columns)
   {
@@ -204,8 +250,12 @@ class QueryBuilder extends \APP_DbObject
     return $this;
   }
 
-  /*
-   * get : run a select query and fetch values
+  /**
+   * Run a select query and fetch values
+   * 
+   * @param bool $returnValueIfOnlyOneRow Whether to return the value if only one row is found. Default is false.
+   * @param bool $debug Whether to enable debug mode to print SQL queries. Default is false.
+   * @return Collection|array The fetched values.
    */
   public function get($returnValueIfOnlyOneRow = false, $debug = false)
   {
@@ -239,13 +289,24 @@ class QueryBuilder extends \APP_DbObject
     }
   }
 
+  /**
+   * Retrieves a single record from the database.
+   *
+   * @return mixed The retrieved record.
+   */
   public function getSingle()
   {
     return $this->limit(1)->get(true);
   }
 
-  /*
+  /**
+   * Retrieves a single value from the database (e.g. COUNT, MAX, MIN).
+   * 
    * ONLY for unary function : COUNT, MAX, MIN
+   * 
+   * @param string $func The function to apply.
+   * @param string|null $field The field to apply the function to (optional).
+   * @return int The result of the function.
    */
   public function func($func, $field = null)
   {
@@ -259,16 +320,34 @@ class QueryBuilder extends \APP_DbObject
     return (int) self::getUniqueValueFromDB($this->sql);
   }
 
+  /**
+   * Counts the number of records in the database table.
+   *
+   * @param string|null $field The field to count. If null, counts all records.
+   * @return int The number of records in the database table.
+   */
   public function count($field = null)
   {
     return self::func('COUNT', $field);
   }
 
+  /**
+   * Calculates the minimum value of a specified field.
+   *
+   * @param string $field The field to calculate the minimum value for.
+   * @return mixed The minimum value of the specified field.
+   */
   public function min($field)
   {
     return self::func('MIN', $field);
   }
 
+  /**
+   * Get the maximum value of a specific field in the database.
+   *
+   * @param string $field The field to get the maximum value from.
+   * @return mixed The maximum value of the specified field.
+   */
   public function max($field)
   {
     return self::func('MAX', $field);
@@ -277,8 +356,10 @@ class QueryBuilder extends \APP_DbObject
   /****************************
    ********* MODIFIERS *********
    ****************************/
-  /*
+  /**
    * Append all the modifiers to a query in the right order
+   * 
+   * @return void
    */
   private function assembleQueryClauses()
   {
@@ -287,11 +368,23 @@ class QueryBuilder extends \APP_DbObject
     $this->sql .= $this->limit ?? '';
   }
 
+  /**
+   * Protects the given argument to be used in a query.
+   *
+   * @param mixed $arg The argument to be protected.
+   * @return mixed The protected argument.
+   */
   private function protect($arg)
   {
     return is_string($arg) ? "'" . mysql_escape_string($arg) . "'" : $arg;
   }
 
+  /**
+   * Computes the WHERE clause for the query.
+   *
+   * @param mixed $arg The argument used to compute the WHERE clause.
+   * @return void
+   */
   protected function computeWhereClause($arg)
   {
     $this->where = is_null($this->where) ? ' WHERE ' : $this->where . ($this->isOrWhere ? ' OR ' : ' AND ');
@@ -320,6 +413,11 @@ class QueryBuilder extends \APP_DbObject
     }
   }
 
+  /**
+   * Adds a WHERE clause to the query.
+   *
+   * @return $this
+   */
   public function where()
   {
     $this->isOrWhere = false;
@@ -329,6 +427,11 @@ class QueryBuilder extends \APP_DbObject
     return $this;
   }
 
+  /**
+   * Add a WHERE IN clause to the query.
+   *
+   * @return $this
+   */
   public function whereIn()
   {
     $this->where = is_null($this->where) ? ' WHERE ' : $this->where . ($this->isOrWhere ? ' OR ' : ' AND ');
@@ -345,6 +448,11 @@ class QueryBuilder extends \APP_DbObject
     return $this;
   }
 
+  /**
+   * Set the "where not in" clause for the query.
+   *
+   * @return $this
+   */
   public function whereNotIn()
   {
     $this->where = is_null($this->where) ? ' WHERE ' : $this->where . ($this->isOrWhere ? ' OR ' : ' AND ');
@@ -361,6 +469,12 @@ class QueryBuilder extends \APP_DbObject
     return $this;
   }
 
+  /**
+   * Set a "where null" clause for the query.
+   *
+   * @param string $field The field to check for null.
+   * @return $this
+   */
   public function whereNull($field)
   {
     $this->where = is_null($this->where) ? ' WHERE ' : $this->where . ($this->isOrWhere ? ' OR ' : ' AND ');
@@ -368,6 +482,12 @@ class QueryBuilder extends \APP_DbObject
     return $this;
   }
 
+  /**
+   * Adds a WHERE condition to the query to filter out rows where the specified field is not null.
+   *
+   * @param string $field The name of the field to check for null values.
+   * @return $this The QueryBuilder instance for method chaining.
+   */
   public function whereNotNull($field)
   {
     $this->where = is_null($this->where) ? ' WHERE ' : $this->where . ($this->isOrWhere ? ' OR ' : ' AND ');
@@ -375,6 +495,11 @@ class QueryBuilder extends \APP_DbObject
     return $this;
   }
 
+  /**
+   * Adds an "OR" condition to the query's WHERE clause.
+   *
+   * @return $this
+   */
   public function orWhere()
   {
     $this->isOrWhere = true;
@@ -384,7 +509,13 @@ class QueryBuilder extends \APP_DbObject
     return $this;
   }
 
-  // Syntaxic sugar
+  /**
+   * Set a WHERE condition to filter results by player ID.
+   * (Syntaxic sugar)
+   *
+   * @param int $pId The player ID to filter by.
+   * @return $this The QueryBuilder instance.
+   */
   public function wherePlayer($pId)
   {
     return $pId == null ? $this : $this->where('player_id', $pId);
@@ -393,12 +524,24 @@ class QueryBuilder extends \APP_DbObject
   /*
    * Limit
    */
+  /**
+   * Set the limit and offset for the query.
+   *
+   * @param int $limit The maximum number of rows to return.
+   * @param int|null $offset The number of rows to skip before starting to return rows.
+   * @return $this The QueryBuilder instance.
+   */
   public function limit($limit, $offset = null)
   {
     $this->limit = " LIMIT {$limit}" . (is_null($offset) ? '' : " OFFSET {$offset}");
     return $this;
   }
 
+  /**
+   * Set the order by clause for the query.
+   *
+   * @return $this
+   */
   public function orderBy()
   {
     $num_args = func_num_args();

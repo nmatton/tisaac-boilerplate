@@ -1,10 +1,13 @@
 <?php
+
 namespace FOO\Core;
+
 use FOO\Managers\Players;
 
 /*
  * Statistics
  */
+
 class Stats extends \FOO\Helpers\DB_Manager
 {
   protected static $table = 'stats';
@@ -178,5 +181,3 @@ class Stats extends \FOO\Helpers\DB_Manager
     return null;
   }
 }
-
-?>

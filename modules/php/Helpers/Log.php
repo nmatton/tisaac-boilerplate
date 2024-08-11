@@ -1,5 +1,7 @@
 <?php
+
 namespace FOO\Helpers;
+
 use FOO\Core\Game;
 use FOO\Core\Notifications;
 use FOO\Managers\Players;
@@ -18,11 +20,17 @@ use FOO\Managers\Players;
 
 class Log extends \APP_DbObject
 {
+  /**
+   * Enable the logging functionality.
+   */
   public function enable()
   {
     Game::get()->setGameStateValue('logging', 1);
   }
 
+  /**
+   * Disables the logging functionality.
+   */
   public function disable()
   {
     Game::get()->setGameStateValue('logging', 0);
@@ -30,6 +38,11 @@ class Log extends \APP_DbObject
 
   /**
    * Add an entry
+   * 
+   * @param array $entry An associative array with the following keys:
+   * - table: the table name
+   * - primary: the primary key
+   * - type: the type of operation (create, update, delete)
    */
   public function addEntry($entry)
   {
@@ -48,20 +61,31 @@ class Log extends \APP_DbObject
     return $query->insert($entry);
   }
 
-  // Create a new checkpoint : anything before that checkpoint cannot be undo (unless in studio)
+  /**
+   * Create a new checkpoint : anything before that checkpoint cannot be undo (unless in studio)
+   * 
+   * @return void
+   */
   public function checkpoint()
   {
     self::clearUndoableStepNotifications();
     return self::addEntry(['type' => 'checkpoint']);
   }
 
-  // Create a new step to allow undo step-by-step
+  /**
+   * Logs a step to allow undo step-by-step
+   *
+   * @return void
+   */
   public function step()
   {
     return self::addEntry(['type' => 'step']);
   }
 
-  // Log the start of engine to allow "restart turn"
+  /**
+   * Log the start of engine to allow "restart turn"
+   * 
+   */
   public function startEngine()
   {
     if (!Globals::isSolo()) {
@@ -71,7 +95,12 @@ class Log extends \APP_DbObject
     return self::addEntry(['type' => 'engine']);
   }
 
-  // Find the last checkpoint
+  /**
+   * Retrieves the last checkpoint.
+   *
+   * @param bool $includeEngineStarts (optional) Whether to include engine starts in the result. Default is false.
+   * @return mixed The last checkpoint.
+   */
   public function getLastCheckpoint($includeEngineStarts = false)
   {
     $query = new QueryBuilder('log', null, 'id');
@@ -91,7 +120,12 @@ class Log extends \APP_DbObject
     return is_null($log) ? 1 : $log['id'];
   }
 
-  // Find all the moments available to undo
+  /**
+   * Retrieves the undoable steps.
+   *
+   * @param bool $onlyIds Determines whether to return only the step IDs (true) or the steps themselves (false). Default is true.
+   * @return mixed Returns the undoable steps or their IDs based on the $onlyIds parameter.
+   */
   public function getUndoableSteps($onlyIds = true)
   {
     $checkpoint = self::getLastCheckpoint();
@@ -220,7 +254,10 @@ class Log extends \APP_DbObject
   }
 
   /**
-   * getCancelMoveIds : get all cancelled notifs IDs from BGA gamelog, used for styling the notifications on page reload
+   * Extracts the notification IDs from the given notifications.
+   *
+   * @param array $notifications The notifications to extract IDs from.
+   * @return array The extracted notification IDs.
    */
   protected function extractNotifIds($notifications)
   {
@@ -234,6 +271,11 @@ class Log extends \APP_DbObject
     return $notificationUIds;
   }
 
+  /**
+   * Get all cancelled notifs IDs from BGA gamelog, used for styling the notifications on page reload
+   * 
+   * @return array The notification IDs of the cancelled notifications.
+   */
   public function getCanceledNotifIds()
   {
     $query = new QueryBuilder('gamelog', null, 'gamelog_packet_id');
@@ -241,7 +283,10 @@ class Log extends \APP_DbObject
   }
 
   /**
-   * clearUndoableStepNotifications : extract and remove all notifications of type 'newUndoableStep' in the gamelog
+   * Extract and remove all notifications of type 'newUndoableStep' in the gamelog
+   * 
+   * @param bool $clearAll (optional) Whether to clear all undoable step notifications. Default is false.
+   * @return void
    */
   public function clearUndoableStepNotifications($clearAll = false)
   {
