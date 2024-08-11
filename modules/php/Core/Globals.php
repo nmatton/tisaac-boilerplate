@@ -1,11 +1,14 @@
 <?php
+
 namespace FOO\Core;
+
 use FOO\Core\Game;
 use FOO\Managers\Players;
 
 /*
  * Globals
  */
+
 class Globals extends \FOO\Helpers\DB_Manager
 {
   protected static $initialized = false;
@@ -32,12 +35,10 @@ class Globals extends \FOO\Helpers\DB_Manager
     $tmp = self::$log;
     self::$log = false;
 
-    foreach (
-      self::DB()
-        ->select(['value', 'name'])
-        ->get(false)
-      as $name => $variable
-    ) {
+    foreach (self::DB()
+      ->select(['value', 'name'])
+      ->get(false)
+      as $name => $variable) {
       if (\array_key_exists($name, self::$variables)) {
         self::$data[$name] = $variable;
       }
@@ -76,6 +77,15 @@ class Globals extends \FOO\Helpers\DB_Manager
 
   /*
    * Magic method that intercept not defined static method and do the appropriate stuff
+   * examples - Globals::getTurn() ,  Globals::setTurn(5) , Globals::incTurn()
+   * usage - the name of the method must follow this pattern :
+   *  - the operation or query to be excecuted (one of the following:  'get' or 'set' or 'inc' or 'is')
+   *  - the name of the variable with the first letter in uppercase
+   * Notes:
+   *  - the global variable cannot have multiple uppercase letters in its name (ex: 'firstPlayer' is ok, 'firstPlayerId' is not)
+   *  - you can use positive of negative arguments for 'inc' (ex: Globals::incTurn(-1) will decrease the turn by 1). when no argument is given, the increment is 1
+   *  - the 'is' operation is only for boolean variables
+   *  - the 'set' operation on int and bool variables will cast the argument to the appropriate type
    */
   public static function __callStatic($method, $args)
   {

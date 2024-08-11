@@ -1,5 +1,7 @@
 <?php
+
 namespace FOO\Helpers;
+
 use FOO\Core\Game;
 use FOO\Core\Notifications;
 use FOO\Managers\Players;
@@ -28,7 +30,9 @@ class Log extends \APP_DbObject
     }
 
     /**
-     * Add an entry
+     * Add an entry to the log table
+     *
+     * @param array $entry An associative array 
      */
     public function addEntry($entry)
     {

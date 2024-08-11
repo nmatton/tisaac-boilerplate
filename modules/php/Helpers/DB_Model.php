@@ -1,5 +1,7 @@
 <?php
+
 namespace FOO\Helpers;
+
 use FOO\Core\Game;
 
 abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
@@ -12,7 +14,7 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
    */
   protected $attributes = [];
 
-    /**
+  /**
    * This array will contains class attributes that does not depends on the DB (static info), they can only be accessed, not modified
    */
   protected $staticAttributes = [];
@@ -41,7 +43,7 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
   }
 
   /**
-   * Get the DB primary row according to attributes mapping
+   * Get the DB primary row according to attributes mapping (property $this->primary in child class)
    */
   private function getPrimaryFieldValue()
   {
@@ -55,7 +57,17 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
   }
 
   /*
-   * Magic method that intercept not defined method and do the appropriate stuff
+   * Magic method that intercept not defined static method and do the appropriate stuff
+   * examples - Globals::getTurn() ,  Globals::setTurn(5) , Globals::incTurn()
+   * usage - the name of the method must follow this pattern :
+   *  - the operation or query to be excecuted (one of the following:  'get' or 'set' or 'inc' or 'is')
+   *  - the name of the variable with the first letter in uppercase
+   * Notes:
+   *  - the global variable cannot have multiple uppercase letters in its name (ex: 'firstPlayer' is ok, 'firstPlayerId' is not)
+   *  - you can use positive of negative arguments for 'inc' (ex: Globals::incTurn(-1) will decrease the turn by 1). when no argument is given, the increment is 1
+   *  - the 'is' operation is only for boolean variables
+   *  - the 'set' operation on int and bool variables will cast the argument to the appropriate type
+   * TODO : reduce complexity (cyclomatic complexity = 30 and npath complexity = 8897)
    */
   public function __call($method, $args)
   {
@@ -63,16 +75,16 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
       // Sanity check : does the name correspond to a declared variable ?
       $name = mb_strtolower($match[2]) . $match[3];
       if (!\array_key_exists($name, $this->attributes)) {
-                // Static attribute getters
-                if (in_array($match[1], ['get', 'is'])) {
-                  foreach ($this->staticAttributes as $attr) {
-                    if (is_array($attr) && $name == $attr[0]) {
-                      return $this->$name ?? ($attr[1] == 'int' ? 0 : []);
-                    } elseif ($attr == $name) {
-                      return $this->$name ?? '';
-                    }
-                  }
-                }
+        // Static attribute getters
+        if (in_array($match[1], ['get', 'is'])) {
+          foreach ($this->staticAttributes as $attr) {
+            if (is_array($attr) && $name == $attr[0]) {
+              return $this->$name ?? ($attr[1] == 'int' ? 0 : []);
+            } elseif ($attr == $name) {
+              return $this->$name ?? '';
+            }
+          }
+        }
         throw new \InvalidArgumentException("Attribute {$name} doesn't exist");
       }
 
@@ -81,8 +93,8 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
           // Handle json field
           return $this->$name[$args[0]] ?? null;
         } else {
-        // Basic getters
-        return $this->$name;
+          // Basic getters
+          return $this->$name;
         }
       } elseif ($match[1] == 'is') {
         // Boolean getter
@@ -90,7 +102,7 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
       } elseif ($match[1] == 'set') {
         // Setters in DB and update cache
         $value = $args[0];
-        
+
         // Auto-cast
         $field = $this->attributes[$name];
         $fieldName = is_array($field) ? $field[0] : $field;
@@ -118,7 +130,7 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
         if ($isObj && $objKey !== null) {
           $this->$name[$objKey] = $value;
         } else {
-        $this->$name = $value;
+          $this->$name = $value;
         }
 
         $updateValue = $this->$name;
@@ -144,7 +156,9 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
   }
 
   /**
-   * Return an array of attributes
+   * Returns an array of all attributes and their values for JSON serialization.
+   *
+   * @return array An array of all attributes and their values.
    */
   public function jsonSerialize()
   {
@@ -155,6 +169,7 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
 
     return $data;
   }
+
 
   /**
    * Save query
@@ -170,9 +185,15 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
         $data[$field] = $this->$attribute;
       }
     }
-
     $this->DB()->update($data, $id);
   }
+
+
+  /**
+   * Returns an array of all attributes and their values, including static attributes, for UI data.
+   *
+   * @return array An array of all attributes and their values, including static attributes, for UI data.
+   */
   public function getUiData()
   {
     $data = $this->jsonSerialize();
@@ -183,9 +204,9 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
       $getter = 'get' . ucfirst($attribute);
       $data[$attribute] = $this->$getter();
     }
-
     return $data;
   }
+
 
   /**
    * Private DB call
@@ -197,11 +218,11 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
     }
 
     $log = null;
-    
+
     if (static::$log ?? Game::get()->getGameStateValue('logging') == 1) {
       $log = new Log(static::$table, static::$primary);
     }
-    
+
     return new QueryBuilder(
       $this->table,
       function ($row) {

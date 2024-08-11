@@ -1,11 +1,27 @@
 <?php
+
 namespace FOO\Core;
+
 use FOO\Managers\Players;
 use FOO\Helpers\Utils;
 use FOO\Core\Globals;
 
 class Notifications
 {
+
+  /* Example */
+  public static function playerAction($currentPlayer, $task)
+  {
+    $data = array_merge($task, [
+      'player' => $currentPlayer,
+      'task' => $task->getId(),
+      'task_name' => $task->getTitle(),
+    ]);
+    $data['i18n'] = ['task_name'];
+    $msg = clienttranslate('${player_name} did the task ${task_name}');
+    self::notifyAll('playerAction', $msg, $data);
+  }
+
   /*************************
    **** GENERIC METHODS ****
    *************************/
@@ -37,7 +53,17 @@ class Notifications
    **** UPDATE ARGS ****
    *********************/
   /*
-   * Automatically adds some standard field about player and/or card
+   * Automatically adds some standard field about player and/or card to the args
+   * (to avoid having to do it manually in each notification)
+   * example : 
+   * when you want to use the {player_name}} variable in a notification, you can just pass the player object in the args and use it in the message like this :
+   * 
+   * $data = ['player' => $currentPlayer,...]
+   * $msg = clienttranslate('${player_name} do action Y');
+   * self::notifyAll('playerAction', $msg, $data);
+   * 
+   * You can do the same for many other purposes
+   * 
    */
   protected static function updateArgs(&$args)
   {
@@ -66,5 +92,3 @@ class Notifications
     // }
   }
 }
-
-?>

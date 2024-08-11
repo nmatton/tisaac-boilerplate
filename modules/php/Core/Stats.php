@@ -30,7 +30,7 @@ class Stats
   /*
    * Create and store a stat declared but not present in DB yet
    *  (only happens when adding stats while a game is running)
-   */
+  */
   public static function checkExistence()
   {
     $default = [
@@ -105,5 +105,3 @@ class Stats
   {
   }
 }
-
-?>
