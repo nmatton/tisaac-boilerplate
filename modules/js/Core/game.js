@@ -297,6 +297,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
               url = n.args.urls.shift();
               dojo.xhrGet({
                 url: url,
+                headers: {
+                  'X-Request-Token': bgaConfig.requestToken,
+                },
                 load: function (success) {
                   console.log('Success for URL', url, success);
                   console.log('Done, reloading page');
