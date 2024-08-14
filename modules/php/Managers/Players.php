@@ -1,5 +1,7 @@
 <?php
+
 namespace FOO\Managers;
+
 use FOO\Core\Game;
 use FOO\Core\Globals;
 use FOO\Core\Preferences;
@@ -9,6 +11,7 @@ use FOO\Helpers\Collection;
  * Players manager : allows to easily access players ...
  *  a player is an instance of Player class
  */
+
 class Players extends \FOO\Helpers\DB_Manager
 {
   protected static $table = 'player';
@@ -18,7 +21,7 @@ class Players extends \FOO\Helpers\DB_Manager
     return new \FOO\Models\Player($row);
   }
 
-  public function setupNewGame($players, $options)
+  public static function setupNewGame($players, $options)
   {
     // Create players
     $gameInfos = Game::get()->getGameinfos();
@@ -43,17 +46,17 @@ class Players extends \FOO\Helpers\DB_Manager
     Game::get()->reloadPlayersBasicInfos();
   }
 
-  public function getActiveId()
+  public static function getActiveId()
   {
     return (int) Game::get()->getActivePlayerId();
   }
 
-  public function getCurrentId()
+  public static function getCurrentId()
   {
     return Game::get()->getCurrentPId();
   }
 
-  public function getAll()
+  public static function getAll()
   {
     $players = self::DB()->get(false);
     return $players;
@@ -62,7 +65,7 @@ class Players extends \FOO\Helpers\DB_Manager
   /*
    * get : returns the Player object for the given player ID
    */
-  public function get($pId = null)
+  public static function get($pId = null)
   {
     $pId = $pId ?: self::getActiveId();
     return self::DB()
@@ -70,7 +73,7 @@ class Players extends \FOO\Helpers\DB_Manager
       ->getSingle();
   }
 
-  public function getMany($pIds)
+  public static function getMany($pIds)
   {
     $players = self::DB()
       ->whereIn($pIds)
@@ -78,17 +81,17 @@ class Players extends \FOO\Helpers\DB_Manager
     return $players;
   }
 
-  public function getActive()
+  public static function getActive()
   {
     return self::get();
   }
 
-  public function getCurrent()
+  public static function getCurrent()
   {
     return self::get(self::getCurrentId());
   }
 
-  public function getNextId($player)
+  public static function getNextId($player)
   {
     $pId = is_int($player) ? $player : $player->getId();
 
@@ -96,7 +99,7 @@ class Players extends \FOO\Helpers\DB_Manager
     return (int) $table[$pId];
   }
 
-  public function getPrevId($player)
+  public static function getPrevId($player)
   {
     $pId = is_int($player) ? $player : $player->getId();
 
@@ -109,7 +112,7 @@ class Players extends \FOO\Helpers\DB_Manager
   /*
    * Return the number of players
    */
-  public function count()
+  public static function count()
   {
     return self::DB()->count();
   }
@@ -117,7 +120,7 @@ class Players extends \FOO\Helpers\DB_Manager
   /*
    * getUiData : get all ui data of all players
    */
-  public function getUiData($pId)
+  public static function getUiData($pId)
   {
     return self::getAll()->map(function ($player) use ($pId) {
       return $player->jsonSerialize($pId);
@@ -127,7 +130,7 @@ class Players extends \FOO\Helpers\DB_Manager
   /**
    * This activate next player
    */
-  public function activeNext()
+  public static function activeNext()
   {
     $pId = self::getActiveId();
     $nextPlayer = self::getNextId((int) $pId);
@@ -139,7 +142,7 @@ class Players extends \FOO\Helpers\DB_Manager
   /**
    * This allow to change active player
    */
-  public function changeActive($pId)
+  public static function changeActive($pId)
   {
     Game::get()->gamestate->changeActivePlayer($pId);
   }

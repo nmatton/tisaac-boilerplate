@@ -1,5 +1,7 @@
 <?php
+
 namespace FOO\Helpers;
+
 use FOO\Core\Game;
 
 class DB_Manager extends \APP_DbObject
@@ -38,18 +40,5 @@ class DB_Manager extends \APP_DbObject
   public static function startLog()
   {
     static::$log = true;
-  }
-
-  public static function stopLog()
-  {
-    static::$log = false;
-    $log = new Log(static::$table, static::$primary);
-    $log->clearAll();
-  }
-
-  public static function revertLogs()
-  {
-    $log = new Log(static::$table, static::$primary);
-    $log->revertAll();
   }
 }

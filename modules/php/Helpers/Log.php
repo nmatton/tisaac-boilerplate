@@ -4,6 +4,7 @@ namespace FOO\Helpers;
 
 use FOO\Core\Game;
 use FOO\Core\Notifications;
+use FOO\Core\Globals;
 use FOO\Managers\Players;
 
 /**
@@ -44,7 +45,7 @@ class Log extends \APP_DbObject
    * - primary: the primary key
    * - type: the type of operation (create, update, delete)
    */
-  public function addEntry($entry)
+  public static function addEntry($entry)
   {
     if (isset($entry['affected'])) {
       $entry['affected'] = \json_encode($entry['affected']);
@@ -56,7 +57,7 @@ class Log extends \APP_DbObject
       $entry['primary'] = '';
     }
 
-    $entry['move_id'] = self::getUniqueValueFromDB('SELECT global_value FROM global WHERE global_id = 3');
+    $entry['move_id'] = Game::get()->getUniqueValueFromDB('SELECT global_value FROM global WHERE global_id = 3');
     $query = new QueryBuilder('log', null, 'id');
     return $query->insert($entry);
   }
@@ -64,7 +65,7 @@ class Log extends \APP_DbObject
   /**
    * Create a new checkpoint : anything before that checkpoint cannot be undo (unless in studio)
    * 
-   * @return void
+   * @return int
    */
   public function checkpoint()
   {
@@ -75,7 +76,7 @@ class Log extends \APP_DbObject
   /**
    * Logs a step to allow undo step-by-step
    *
-   * @return void
+   * @return int
    */
   public function step()
   {

@@ -87,7 +87,7 @@ class Pieces extends DB_Manager
   /**
    * Retrieves the update query for the specified IDs, location, and state.
    *
-   * @param array $ids An array of IDs to update.
+   * @param array|int|null $ids An array of IDs to update (single int will be converted to array).
    * @param mixed $location The location to update.
    * @param mixed $state The state to update.
    * @return QueryBuilder The query builder object.
@@ -120,7 +120,7 @@ class Pieces extends DB_Manager
    * @param mixed $state The state parameter for the WHERE clause. Default is null.
    * @return QueryBuilder The query builder object.
    */
-  protected function addWhereClause(&$query, $id = null, $location = null, $state = null)
+  protected static function addWhereClause(&$query, $id = null, $location = null, $state = null)
   {
     if (!is_null($id)) {
       $whereOp = strpos($id, '%') !== false ? 'LIKE' : '=';
@@ -200,7 +200,7 @@ class Pieces extends DB_Manager
     }
   }
 
-  final function checkIdArray($arr)
+  final static function checkIdArray($arr)
   {
     if (is_null($arr)) {
       throw new \BgaVisibleSystemException('Class Pieces: tokens cannot be null');
@@ -268,7 +268,7 @@ class Pieces extends DB_Manager
   /**
    * Retrieves multiple pieces by their IDs.
    *
-   * @param array $ids The array of piece IDs.
+   * @param array|int $ids The array of piece IDs to retrieve (single int will be converted to array).
    * @param bool $raiseExceptionIfNotEnough (optional) Whether to raise an exception if not enough pieces are found. Default is true.
    * @return mixed The retrieved pieces.
    */
@@ -367,9 +367,9 @@ class Pieces extends DB_Manager
 
 
   /**
-   * Retrieves pieces based on the specified location, state, and order.
+   * Retrieves the query object for a (set of) piece in a specific location.
    *
-   * @param string $location The location to search for pieces.
+   * @param string|array $location The location to search for pieces. if the location is an array, it is imploded using underscores
    * @param mixed $state The state of the pieces to retrieve. Defaults to null.
    * @param mixed $orderBy The order in which to retrieve the pieces. Defaults to null.
    * @return QueryBuilder The query builder object.
@@ -392,10 +392,10 @@ class Pieces extends DB_Manager
   /**
    * Retrieves pieces in a specific location.
    *
-   * @param string $location The location to retrieve pieces from.
+   * @param string|array $location The location to retrieve pieces from. if the location is an array, it is imploded using underscores
    * @param mixed $state (optional) The state of the pieces to retrieve.
-   * @param string $orderBy (optional) The field to order the pieces by.
-   * @return QueryBuilder The query builder object.
+   * @param string[] $orderBy (optional) The field to order the pieces by.
+   * @return Collection The restulting pieces as a collection
    */
   public static function getInLocation($location, $state = null, $orderBy = null)
   {
@@ -407,7 +407,7 @@ class Pieces extends DB_Manager
    *
    * @param string $location The location to retrieve items from.
    * @param mixed $state (optional) The state of the items to retrieve.
-   * @return QueryBuilder The query builder object.
+   * @return Collection The items in the specified location.
    */
   public static function getInLocationOrdered($location, $state = null)
   {
@@ -459,7 +459,7 @@ class Pieces extends DB_Manager
    * @param int $pId The ID of the data to retrieve.
    * @param mixed $location The location of the data (optional).
    * @param mixed $type The type of the data (optional).
-   * @return QueryBuilder The query builder object.
+   * @return Collection The filtered data.
    */
   public function getFiltered($pId, $location = null, $type = null)
   {
@@ -476,7 +476,7 @@ class Pieces extends DB_Manager
    *
    * @param int $id The ID to set the state for.
    * @param mixed $state The state to set.
-   * @return void
+   * @return array
    */
   public static function setState($id, $state)
   {
@@ -486,12 +486,12 @@ class Pieces extends DB_Manager
   }
 
   /**
-   * Moves one (or many) pieces to the given location with an optional state.
+   * Moves one (or many) pieces to the given location with an given state.
    *
    * @param int|array $ids The IDs to be moved.
    * @param string $location The location to move the IDs to.
-   * @param int $state The optional state of the moved IDs. Default is 0.
-   * @return void
+   * @param int $state The given state of the moved IDs. Default is 0.
+   * @return array
    */
   public static function move($ids, $location, $state = 0)
   {
@@ -550,8 +550,8 @@ class Pieces extends DB_Manager
    * Return pieces infos or void array if no card in the specified location
    *
    * @param int $nbr The number of pieces to pick.
-   * @param string $fromLocation The location from which to pick the pieces.
-   * @param string $toLocation The location to which the pieces will be moved.
+   * @param string|array $fromLocation The location from which to pick the pieces. if the location is an array, it is imploded using underscores
+   * @param string|array $toLocation The location to which the pieces will be moved. if the location is an array, it is imploded using underscores
    * @param int $state The state of the pieces (optional, default: 0).
    * @param bool $deckReform Whether to reform the deck after picking the pieces (optional, default: true).
    * @return mixed|array pieces infos or void array if no card in the specified location
@@ -711,7 +711,7 @@ class Pieces extends DB_Manager
    * @param mixed $globalId The global ID (optional).
    * @return array The created pieces ids
    */
-  function create($pieces, $globalLocation = null, $globalState = null, $globalId = null)
+  public static function create($pieces, $globalLocation = null, $globalState = null, $globalId = null)
   {
     $pos = is_null($globalLocation) ? 0 : self::getExtremePosition(true, $globalLocation) + 1;
 

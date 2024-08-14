@@ -9,16 +9,6 @@ abstract class Utils extends \APP_DbObject
     $data = array_values(array_filter($data, $filter));
   }
 
-  public static function die($args = null)
-  {
-    if (is_null($args)) {
-      throw new \BgaVisibleSystemException(
-        implode('<br>', self::$logmsg)
-      );
-    }
-    throw new \BgaVisibleSystemException(json_encode($args));
-  }
-
   /**
    * Calculates the difference between the values of an array and the values of another array.
    *
@@ -35,7 +25,7 @@ abstract class Utils extends \APP_DbObject
    * Shuffles the elements of an associative array.
    *
    * @param array $array The array to be shuffled.
-   * @return void
+   * @return bool True on success, void on failure.
    */
   public static function shuffle_assoc(&$array)
   {

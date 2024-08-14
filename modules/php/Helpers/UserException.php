@@ -1,5 +1,7 @@
 <?php
+
 namespace FOO\Helpers;
+
 use FOO\Core\Game;
 
 class UserException extends \BgaUserException
@@ -9,4 +11,3 @@ class UserException extends \BgaUserException
     parent::__construct(Game::get()::translate($str));
   }
 }
-?>

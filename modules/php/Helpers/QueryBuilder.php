@@ -26,9 +26,9 @@ class QueryBuilder extends \APP_DbObject
    * Constructor for the QueryBuilder class.
    *
    * @param string $table The name of the table to query.
-   * @param mixed $cast The type to cast the query results to. Default is null.
-   * @param string $primary The name of the primary key column. Default is 'id'.
-   * @param bool $log Whether to enable logging. Default is false.
+   * @param mixed|null $cast The type to cast the query results to. Default is null.
+   * @param string|null $primary The name of the primary key column. Default is 'id'.
+   * @param bool|null $log Whether to enable logging. Default is false.
    */
   public function __construct($table, $cast = null, $primary = 'id', $log = false)
   {

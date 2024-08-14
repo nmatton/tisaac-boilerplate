@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
@@ -52,7 +53,7 @@ class foogame extends Table
       'logging' => 10,
     ]);
     Stats::checkExistence();
-    $this->bIndependantMultiactiveTable=true;
+    $this->bIndependantMultiactiveTable = true;
   }
 
   public static function get()
@@ -113,13 +114,13 @@ class foogame extends Table
   // Exposing protected method getCurrentPlayerId
   public static function getCurrentPId()
   {
-    return self::getCurrentPlayerId();
+    return self::get()->getCurrentPlayerId();
   }
 
   // Exposing protected method translation
   public static function translate($text)
   {
-    return self::_($text);
+    return self::get()->_($text);
   }
 
   ////////////////////////////////////
@@ -167,7 +168,5 @@ class foogame extends Table
    *  - int $from_version : current version of this game database, in numerical form.
    *      For example, if the game was running with a release of your game named "140430-1345", $from_version is equal to 1404301345
    */
-  public function upgradeTableDb($from_version)
-  {
-  }
+  public function upgradeTableDb($from_version) {}
 }

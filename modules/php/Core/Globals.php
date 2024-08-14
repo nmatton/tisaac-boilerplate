@@ -140,7 +140,6 @@ class Globals extends \FOO\Helpers\DB_Manager
       }
     } else {
       throw new \feException('unknown method ' . $method);
-      return null;
     }
     // return undefined;
   }

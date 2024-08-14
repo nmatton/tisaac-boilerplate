@@ -96,53 +96,41 @@ class APP_DbObject extends APP_Object
 
     function DbGetLastId()
     {
+        return 0;
     }
 
     function DbAffectedRow()
     {
+        return [];
     }
 
-    function escapeStringForDB($string)
-    {
-    }
+    function escapeStringForDB($string) {}
 }
 
-class APP_Action extends APP_DbObject
-{
-}
+class APP_Action extends APP_DbObject {}
 
 class APP_GameClass extends APP_DbObject
 {
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 }
 
 class GameState
 {
     public $table_globals;
 
-    function GameState()
-    {
-    }
+    function GameState() {}
 
     function state()
     {
         return array();
     }
 
-    function changeActivePlayer($player_id)
-    {
-    }
+    function changeActivePlayer($player_id) {}
 
-    function setAllPlayersMultiactive()
-    {
-    }
+    function setAllPlayersMultiactive() {}
 
-    function setAllPlayersNonMultiactive($next_state)
-    {
-    }
+    function setAllPlayersNonMultiactive($next_state) {}
 
     /**
      * Sets a specific list of players active during a multiactive gamestate. 
@@ -155,33 +143,19 @@ class GameState
      * 
      * @return bool Returns true if state transition happened, false otherwise.
      */
-    function setPlayersMultiactive($players, $next_state, $bExclusive = false)
-    {
-    }
+    function setPlayersMultiactive($players, $next_state, $bExclusive = false) {}
 
-    function setPlayerNonMultiactive($player_id, $next_state)
-    {
-    }
+    function setPlayerNonMultiactive($player_id, $next_state) {}
 
-    function getActivePlayerList()
-    {
-    }
+    function getActivePlayerList() {}
 
-    function updateMultiactiveOrNextState($next_state_if_none)
-    {
-    }
+    function updateMultiactiveOrNextState($next_state_if_none) {}
 
-    function nextState($transition)
-    {
-    }
+    function nextState($transition) {}
 
-    function jumpToState($stateNum)
-    {
-    }
+    function jumpToState($stateNum) {}
 
-    function checkPossibleAction($action)
-    {
-    }
+    function checkPossibleAction($action) {}
 
     function reloadState()
     {
@@ -241,9 +215,7 @@ abstract class Table extends APP_GameClass
     /** Report gamename for translation function */
     abstract protected function getGameName();
 
-    function sendNotifications()
-    {
-    }
+    function sendNotifications() {}
 
     function getAllTableDatas()
     {
@@ -323,22 +295,16 @@ abstract class Table extends APP_GameClass
      * Setup correspondance "labels to id"
      * @param [] $labels - map string -> int (label of state variable -> numeric id in the database)
      */
-    function initGameStateLabels($labels)
-    {
-    }
+    function initGameStateLabels($labels) {}
 
-    function setGameStateInitialValue($value_label, $value_value)
-    {
-    }
+    function setGameStateInitialValue($value_label, $value_value) {}
 
     function getGameStateValue($value_label)
     {
         return 0;
     }
 
-    function setGameStateValue($value_label, $value_value)
-    {
-    }
+    function setGameStateValue($value_label, $value_value) {}
 
     function incGameStateValue($value_label, $increment)
     {
@@ -348,16 +314,12 @@ abstract class Table extends APP_GameClass
     /**
      *   Make the next player active (in natural order)
      */
-    protected function activeNextPlayer()
-    {
-    }
+    protected function activeNextPlayer() {}
 
     /**
      *   Make the previous player active  (in natural order)
      */
-    protected function activePrevPlayer()
-    {
-    }
+    protected function activePrevPlayer() {}
 
     /**
      * Check if action is valid regarding current game state (exception if fails)
@@ -365,9 +327,7 @@ abstract class Table extends APP_GameClass
      * @param string $actionName
      * @param boolean $bThrowException
      */
-    function checkAction($actionName, $bThrowException = true)
-    {
-    }
+    function checkAction($actionName, $bThrowException = true) {}
 
     function getNextPlayerTable()
     {
@@ -411,27 +371,21 @@ abstract class Table extends APP_GameClass
         echo "\n";
     }
 
-    function notifyPlayer($player_id, $notification_type, $notification_log, $notification_args)
-    {
-    }
+    function notifyPlayer($player_id, $notification_type, $notification_log, $notification_args) {}
 
     function getStatTypes()
     {
         return array();
     }
 
-    function initStat($table_or_player, $name, $value, $player_id = null)
-    {
-    }
+    function initStat($table_or_player, $name, $value, $player_id = null) {}
 
     function setStat($value, $name, $player_id = null, $bDoNotLoop = false)
     {
         echo "stat: $name=$value\n";
     }
 
-    function incStat($delta, $name, $player_id = null)
-    {
-    }
+    function incStat($delta, $name, $player_id = null) {}
 
     function getStat($name, $player_id = null)
     {
@@ -448,40 +402,28 @@ abstract class Table extends APP_GameClass
         return 2;
     }
 
-    function reattributeColorsBasedOnPreferences($players, $colors)
-    {
-    }
+    function reattributeColorsBasedOnPreferences($players, $colors) {}
 
-    function reloadPlayersBasicInfos()
-    {
-    }
+    function reloadPlayersBasicInfos() {}
 
-    function getNew($deck_definition)
-    {
-    }
+    function getNew($deck_definition) {}
 
     // Give standard extra time to this player
     // (standard extra time is a game option)
-    function giveExtraTime($player_id, $specific_time = null)
-    {
-    }
+    function giveExtraTime($player_id, $specific_time = null) {}
 
     function getStandardGameResultObject()
     {
         return array();
     }
 
-    function applyDbChangeToAllDB($sql)
-    {
-    }
+    function applyDbChangeToAllDB($sql) {}
 
     /**
      *
      * @deprecated
      */
-    function applyDbUpgradeToAllDB($sql)
-    {
-    }
+    function applyDbUpgradeToAllDB($sql) {}
 
 
     function getGameinfos()
@@ -503,14 +445,10 @@ abstract class Table extends APP_GameClass
     }
 
     /* save undo state after all transations are done */
-    function undoSavepoint()
-    {
-    }
+    function undoSavepoint() {}
 
     /* restored db to saved state */
-    function undoRestorePoint()
-    {
-    }
+    function undoRestorePoint() {}
 
     function getBgaEnvironment()
     {
@@ -547,9 +485,7 @@ class GUser
     }
 }
 
-class game_view
-{
-}
+class game_view {}
 
 
 // Arg types
@@ -591,12 +527,8 @@ class APP_GameAction extends  APP_Action
     {
         return '';
     }
-    protected function setAjaxMode($bCheckCsrf = true)
-    {
-    }
-    protected function ajaxResponse($data = '')
-    {
-    }
+    protected function setAjaxMode($bCheckCsrf = true) {}
+    protected function ajaxResponse($data = '') {}
     protected function isArg($argName)
     {
         return true;
