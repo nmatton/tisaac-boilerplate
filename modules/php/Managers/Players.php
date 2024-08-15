@@ -12,15 +12,23 @@ use FOO\Helpers\Collection;
  *  a player is an instance of Player class
  */
 
-class Players extends \FOO\Helpers\DB_Manager
+class Players extends \FOO\Helpers\CachedDB_Manager
 {
   protected static $table = 'player';
   protected static $primary = 'player_id';
+  protected static $datas = null;
   protected static function cast($row)
   {
     return new \FOO\Models\Player($row);
   }
 
+  /**
+   * Call this method at game setup from foogame.game.php
+   *
+   * @param array $players An array of players participating in the game.
+   * @param array $options An array of options for the game.
+   * @return void
+   */
   public static function setupNewGame($players, $options)
   {
     // Create players
@@ -44,53 +52,69 @@ class Players extends \FOO\Helpers\DB_Manager
 
     Game::get()->reattributeColorsBasedOnPreferences($players, $gameInfos['player_colors']);
     Game::get()->reloadPlayersBasicInfos();
+    self::invalidate();
   }
 
+  /**
+   * Retrieves the active ID of the player.
+   *
+   * @return int The active ID of the player.
+   */
   public static function getActiveId()
   {
     return (int) Game::get()->getActivePlayerId();
   }
 
+  /**
+   * Retrieves the **current** ID of the player.
+   * Remind to not use this method in multiactive state.
+   *
+   * @return int The current ID of the player.
+   */
   public static function getCurrentId()
   {
     return Game::get()->getCurrentPId();
   }
 
-  public static function getAll()
-  {
-    $players = self::DB()->get(false);
-    return $players;
-  }
 
-  /*
-   * get : returns the Player object for the given player ID
+  /**
+   * Returns the Player object for the given player ID
+   *
+   * @param int $id The ID of the player to retrieve.
+   * @return \FOO\Models\Player The player object.
    */
-  public static function get($pId = null)
+  public static function get($id = null)
   {
-    $pId = $pId ?: self::getActiveId();
-    return self::DB()
-      ->where($pId)
-      ->getSingle();
+    return parent::get($id ?? self::getActiveId());
   }
 
-  public static function getMany($pIds)
-  {
-    $players = self::DB()
-      ->whereIn($pIds)
-      ->get();
-    return $players;
-  }
-
+  /**
+   * Returns the Player object for the active player
+   *
+   * @return \FOO\Models\Player The player object.
+   */
   public static function getActive()
   {
     return self::get();
   }
 
+  /**
+   * Returns the Player object for the current player
+   * Remind to not use this method in multiactive state.
+   *
+   * @return \FOO\Models\Player The player object.
+   */
   public static function getCurrent()
   {
     return self::get(self::getCurrentId());
   }
 
+  /**
+   * Retrieves the next ID for a player.
+   *
+   * @param \FOO\Models\Player|int $player The player objecto or ID.
+   * @return int The ID for the next player.
+   */
   public static function getNextId($player)
   {
     $pId = is_int($player) ? $player : $player->getId();
@@ -99,6 +123,12 @@ class Players extends \FOO\Helpers\DB_Manager
     return (int) $table[$pId];
   }
 
+  /**
+   * Retrieves the previous ID for a player.
+   *
+   * @param \FOO\Models\Player|int $player The player objecto or ID.
+   * @return int The ID for the previous player.
+   */
   public static function getPrevId($player)
   {
     $pId = is_int($player) ? $player : $player->getId();
@@ -109,16 +139,21 @@ class Players extends \FOO\Helpers\DB_Manager
     return $pId;
   }
 
-  /*
+  /**
    * Return the number of players
+   * 
+   * @return int The number of players
    */
   public static function count()
   {
-    return self::DB()->count();
+    return self::getAll()->count();
   }
 
-  /*
+  /**
    * getUiData : get all ui data of all players
+   * 
+   * @param int $pId The player ID
+   * @return Collection The ui data of all players as a collection
    */
   public static function getUiData($pId)
   {
@@ -129,6 +164,8 @@ class Players extends \FOO\Helpers\DB_Manager
 
   /**
    * This activate next player
+   * 
+   * @return int The ID of the next player
    */
   public static function activeNext()
   {
@@ -141,6 +178,9 @@ class Players extends \FOO\Helpers\DB_Manager
 
   /**
    * This allow to change active player
+   * 
+   * @param int $pId The ID of the player to activate
+   * @return void
    */
   public static function changeActive($pId)
   {

@@ -41,6 +41,29 @@ class Collection extends \ArrayObject
   }
 
   /**
+   * Retrieve the last element from the collection, or null if the collection is empty.
+   *
+   * @return mixed|null The last element of the collection, or null if the collection is empty.
+   */
+  public function last()
+  {
+    $arr = $this->toArray();
+    return empty($arr) ? null : $arr[count($arr) - 1];
+  }
+
+  /**
+   * Check if the collection has a specific key.
+   *
+   * @param mixed $key The key to check for.
+   * @return bool Returns true if the collection has the key, false otherwise.
+   */
+  public function has($key)
+  {
+    return array_key_exists($key, $this->getArrayCopy());
+  }
+
+
+  /**
    * Returns a random element from the collection.
    *
    * @return mixed The randomly selected element.
@@ -183,4 +206,100 @@ class Collection extends \ArrayObject
     \uasort($t, $callback);
     return new Collection($t);
   }
+
+  /*****
+   * Methods for collection of object
+   */
+
+  /**
+   * Filters the collection based on the specified field and value.
+   *
+   * This method filters the collection of objects, returning only those where the specified field matches the given value.
+   * If the value is an array, it checks if the field's value is in the array. If the value contains a wildcard ('%'),
+   * it performs a "like" match. If the value is null, the original collection is returned unfiltered.
+   *
+   * @param string $field The name of the field to filter by.
+   * @param mixed $value The value to compare against the field's value. Can be a scalar, array, or string with wildcards.
+   * 
+   * @return Collection A filtered collection of objects based on the field and value criteria.
+   */
+  public function where($field, $value)
+  {
+    return is_null($value)
+      ? $this
+      : $this->filter(function ($obj) use ($field, $value) {
+        $method = 'get' . ucfirst($field);
+        $objValue = $obj->$method();
+        return is_array($value)
+          ? in_array($objValue, $value)
+          : (strpos($value, '%') !== false
+            ? like_match($value, $objValue)
+            : $objValue == $value);
+      });
+  }
+
+  /**
+   * Filters the collection, returning objects where the specified field is null.
+   *
+   * This method filters the collection of objects, returning only those where the specified field has a null value.
+   *
+   * @param string $field The name of the field to check for null values.
+   * 
+   * @return Collection A filtered collection of objects where the specified field is null.
+   */
+  public function whereNull($field)
+  {
+    return $this->filter(function ($obj) use ($field) {
+      $method = 'get' . ucfirst($field);
+      $objValue = $obj->$method();
+      return is_null($objValue);
+    });
+  }
+
+  /**
+   * Sorts the collection by the specified field in ascending or descending order.
+   *
+   * @param string $field The field to sort the collection by.
+   * @param string $asc The sorting order. Defaults to 'ASC'.
+   * @return Collection The sorted collection.
+   */
+  public function orderBy($field, $asc = 'ASC')
+  {
+    return $this->order(function ($a, $b) use ($field, $asc) {
+      $method = 'get' . ucfirst($field);
+      return $asc == 'ASC' ? $a->$method() - $b->$method() : $b->$method() - $a->$method();
+    });
+  }
+
+  /**
+   * Updates the specified field of all objects in the collection with the given value.
+   *
+   * This method iterates over the collection and updates the specified field of each object with the provided value.
+   *
+   * @param string $field The name of the field to update.
+   * @param mixed $value The new value to assign to the field.
+   * 
+   * @return Collection The collection of objects after the field has been updated.
+   */
+  public function update($field, $value)
+  {
+    $method = 'set' . ucfirst($field);
+    foreach ($this->getArrayCopy() as $obj) {
+      $obj->$method($value);
+    }
+    return $this;
+  }
+}
+
+/**
+ * Perform a pattern match on a subject string.
+ *
+ * @param string $pattern The pattern to match.
+ * @param string $subject The subject string to match against.
+ * @return bool Returns true if the pattern matches the subject, false otherwise.
+ */
+function like_match($pattern, $subject)
+{
+  $pattern = str_replace('%', '.*', preg_quote($pattern, '/'));
+  return (bool) preg_match("/^{$pattern}$/i", $subject);
 }

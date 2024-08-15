@@ -17,6 +17,14 @@ const CARD_PINK = 2;
 const CARD_YELLOW = 3;
 const CARD_SUBMARINE = 4;
 
+
+/*
+ * Example resource constants
+ */
+const GOLD = "GOLD";
+const WOOD = "WOOD";
+const STONE = "STONE";
+const RESOURCES = [GOLD, WOOD, STONE];
 /*
  * Game options
  */

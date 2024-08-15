@@ -232,7 +232,7 @@ class Log extends \APP_DbObject
     }
 
     // Force to clear cached informations
-    Globals::fetch();
+    self::invalidate();
 
     // Notify
     $datas = Game::get()->getAllDatas();
@@ -252,6 +252,13 @@ class Log extends \APP_DbObject
     }
 
     return $moveIds;
+  }
+
+  public static function invalidate()
+  {
+    Globals::fetch();
+    Players::invalidate();
+    Notifications::resetCache();
   }
 
   /**
