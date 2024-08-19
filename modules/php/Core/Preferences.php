@@ -1,10 +1,13 @@
 <?php
+
 namespace FOO\Core;
+
 use FOO\Core\Game;
 
 /*
  * User preferences
  */
+
 class Preferences extends \FOO\Helpers\DB_Manager
 {
   protected static $table = 'user_preferences';
@@ -26,7 +29,7 @@ class Preferences extends \FOO\Helpers\DB_Manager
   public static function setupNewGame($players, $prefs)
   {
     // Load user preferences
-    include dirname(__FILE__) . '/../../../gameoptions.inc.php';
+    $game_preferences = Game::get()->getTablePreferences();
 
     $preferences = $game_preferences + self::getLocalPrefsData();
     $values = [];
@@ -55,7 +58,7 @@ class Preferences extends \FOO\Helpers\DB_Manager
   public static function checkExistence()
   {
     // Load user preferences
-    include dirname(__FILE__) . '/../../../gameoptions.inc.php';
+    $game_preferences = Game::get()->getTablePreferences();
 
     $playerIds = array_keys(Game::get()->loadPlayersBasicInfos());
     $preferences = $game_preferences + self::getLocalPrefsData();
