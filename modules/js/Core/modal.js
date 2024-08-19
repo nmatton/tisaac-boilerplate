@@ -61,6 +61,8 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
 
     scale: 1,
     breakpoint: null, // auto resize if < breakpoint using scale
+    vscale: 1,
+    vbreakpoint: null,
   };
 
   return declare('customgame.modal', null, {
@@ -126,7 +128,7 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
         top: '0px',
         width: '100%',
         height: '100%',
-        zIndex: 949,
+        zIndex: 1049,
         opacity: 0,
         backgroundColor: 'white',
       });
@@ -137,7 +139,7 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
         top: '0px',
         width: 'min(100%,100vw)',
         height: '100vh',
-        zIndex: 950,
+        zIndex: 1050,
         opacity: 0,
         display: 'flex',
         justifyContent: 'center',
@@ -167,10 +169,16 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
         height: bdy.h + 'px',
       });
 
+      let modalScale = 1;
       if (this.breakpoint != null) {
         let newModalWidth = bdy.w * this.scale;
-        let modalScale = newModalWidth / this.breakpoint;
-        if (modalScale > 1) modalScale = 1;
+        modalScale = Math.min(modalScale, newModalWidth / this.breakpoint);
+      }
+      if (this.vbreakpoint != null) {
+        let newModalHeight = (window.innerHeight - 125) * this.vscale;
+        modalScale = Math.min(modalScale, newModalHeight / this.vbreakpoint);
+      }
+      if (modalScale < 1) {
         dojo.style('popin_' + this.id, {
           transform: `scale(${modalScale})`,
           transformOrigin: this.verticalAlign == 'center' ? 'center center' : 'top center',
@@ -330,8 +338,7 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
       this._isClosing = true;
       this._isOpening = false;
       this.fadeOutAnimation().then(() => {
-        if(!this._isClosing || this._isOpening)
-          return;
+        if (!this._isClosing || this._isOpening) return;
         this._isClosing = false;
         this._open = false;
 
@@ -356,8 +363,7 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
       this._isOpening = false;
       this._isClosing = true;
       this.fadeOutAnimation().then(() => {
-        if(!this._isClosing || this._isOpening)
-          return;
+        if (!this._isClosing || this._isOpening) return;
         this._isClosing = false;
         this._open = false;
 

@@ -227,4 +227,27 @@ abstract class Utils extends \APP_DbObject
 
     return $unique_array;
   }
+
+  /**
+   * Splits an array of values into positive and negative arrays.
+   *
+   * @param array $inputArray The input array to be split.
+   * @return array An array containing two arrays: the positive values and the negative values.
+   */
+  public static function splitPositiveNegativeValues($inputArray)
+  {
+    $positiveArray = [];
+    $negativeArray = [];
+
+    foreach ($inputArray as $key => $value) {
+      if ($value > 0) {
+        // If the value is positive, add it to the positiveArray
+        $positiveArray[$key] = $value;
+      } else {
+        // If the value is negative, add it to the negativeArray
+        $negativeArray[$key] = $value;
+      }
+    }
+    return [$positiveArray, $negativeArray];
+  }
 }
