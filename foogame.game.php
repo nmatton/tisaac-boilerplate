@@ -43,6 +43,7 @@ class foogame extends Table
 {
   use FOO\DebugTrait;
   use FOO\States\DrawCardTrait;
+  use FOO\States\PlayerTurnTrait;
 
   public static $instance = null;
   function __construct()
