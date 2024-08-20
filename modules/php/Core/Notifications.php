@@ -58,6 +58,20 @@ class Notifications
     self::notifyAll('playerAction', $msg, $data);
   }
 
+  public static function cardPlaced($player, $card, $side, $silent = false)
+  {
+    $card_name = $card->getName();
+    $data = [
+      'i18n' => ['card_name'],
+      'player' => $player,
+      'card' => $card,
+      'card_name' => $card_name,
+      'side' => $side
+    ];
+    $msg = $silent ? '' : clienttranslate('${player_name} placed ${card_name}');
+    self::notifyAll('cardPlaced', $msg, $data);
+  }
+
 
   /*************************
    **** GENERIC METHODS ****

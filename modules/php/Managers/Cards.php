@@ -43,6 +43,14 @@ class Cards extends \FOO\Helpers\Pieces
     return self::getInLocation(['hand', $pId]);
   }
 
+  /**
+   * Returns the card with the given ID
+   */
+  public static function getById($id)
+  {
+    return  self::getSingle($id);
+  }
+
   //////////////////////////////////
   //////////////////////////////////
   ///////////// SETTERS //////////////

@@ -36,13 +36,13 @@ echo "Project name: $PROJECT_NAME"
 ACRONYM=$(echo "${PROJECT_NAME:0:3}" | tr '[:lower:]' '[:upper:]')
 
 # Move files with the project name, dbmodel.sql, and modules folder to backup
-for file in *"$PROJECT_NAME"* dbmodel.sql; do
+for file in *"$PROJECT_NAME"* dbmodel.sql material.inc.php; do
   if [ -e "$file" ]; then
     mv "$file" "$BACKUP/"
   fi
 done
 
-echo "Files with the project name and dbmodel.sql moved to backup."
+echo "Files with the project name,  dbmodel.sql and material.inc.php moved to backup."
 
 if [ -d "./modules" ]; then
   mv ./modules "$BACKUP/"
