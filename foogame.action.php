@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
@@ -16,23 +17,25 @@
 
 class action_foogame extends APP_GameAction
 {
-  // Constructor: please do not modify
+  /**
+   * This is the constructor. Do not try to implement a `__construct` to bypass this method.
+   */
   public function __default()
   {
-    if (self::isArg('notifwindow')) {
-      $this->view = 'common_notifwindow';
-      $this->viewArgs['table'] = self::getArg('table', AT_posint, true);
+    if ($this->isArg("notifwindow")) {
+      $this->view = "common_notifwindow";
+      $this->viewArgs["table"] = $this->getArg("table", AT_posint, true);
     } else {
-      $this->view = 'foogame_foogame';
-      self::trace('Complete reinitialization of board game');
+      $this->view = "foogame_foogame";
+      $this->trace("Complete re-initialization of board game.");
     }
   }
-  
+
   public function actSkip()
   {
-    self::setAjaxMode();
+    $this->setAjaxMode();
     $this->game->actSkip();
-    self::ajaxResponse();
+    $this->ajaxResponse();
   }
   ///////////////////
   /////  PREFS  /////
@@ -40,11 +43,11 @@ class action_foogame extends APP_GameAction
 
   public function actChangePref()
   {
-    self::setAjaxMode();
-    $pref = self::getArg('pref', AT_posint, false);
-    $value = self::getArg('value', AT_posint, false);
+    $this->setAjaxMode();
+    $pref = $this->getArg('pref', AT_posint, false);
+    $value = $this->getArg('value', AT_posint, false);
     $this->game->actChangePreference($pref, $value);
-    self::ajaxResponse();
+    $this->ajaxResponse();
   }
 
 
@@ -69,5 +72,4 @@ class action_foogame extends APP_GameAction
     }
     return true;
   }
-
 }

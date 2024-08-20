@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Run this script tp 
+# Run this script to set up the boilerplate code for a new project.
+# The script will clone the boilerplate repository, replace placeholders with the project name and acronym,
+# and move the necessary files to the root directory.
 
 # Set TMP folder and Backup folder paths
 TMP=~/TMP_BGA_Boilerplate/
@@ -23,13 +25,15 @@ fi
 echo "Files retrieved from the repository."
 
 # Get the project name from the .css file in the current directory
-# Check if any .css files exist
 if ! PROJECT_NAME=$(basename *.css .css); then
-    echo "Error: No .css file found in the current directory."
+    echo "Error: No .css file found in the current directory. (used to get the basename of the project)"
     exit 1
 fi
 
 echo "Project name: $PROJECT_NAME"
+
+# Create an acronym from the first 3 letters of the project name, capitalized
+ACRONYM=$(echo "${PROJECT_NAME:0:3}" | tr '[:lower:]' '[:upper:]')
 
 # Move files with the project name, dbmodel.sql, and modules folder to backup
 for file in *"$PROJECT_NAME"* dbmodel.sql; do
@@ -54,6 +58,19 @@ find "$TMP" -type f -not -name '*.png' -not -name '*.jpg' -exec sed -i "" -e "s/
 
 
 echo "Replaced 'foogame' with the project name in the TMP folder."
+
+# Replace all occurrences of "FOO" with the acronym in PHP files
+find "$TMP" -type f -name '*.php' -exec sed -i "" -e "s/FOO/$ACRONYM/g" {} \; 2>/dev/null
+
+echo "Replaced 'FOO' with the acronym in PHP files."
+
+
+# Replace all occurrences of "foo" with the acronym (lowercase) in .css, .js, and .scss files
+LOWER_ACRONYM=$(echo "$ACRONYM" | tr '[:upper:]' '[:lower:]')
+find "$TMP" -type f \( -name '*.css' -o -name '*.js' -o -name '*.scss' \) -exec sed -i "" -e "s/foo/$LOWER_ACRONYM/g" {} \; 2>/dev/null
+
+echo "Replaced 'foo' with the acronym (lowercase) in .css, .js, and .scss files."
+
 
 # Rename files in TMP folder to replace all occurrences of "foogame" with the project name
 find "$TMP" -depth | while read -r file; do
