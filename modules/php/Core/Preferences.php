@@ -52,8 +52,13 @@ class Preferences extends \FOO\Helpers\DB_Manager
     }
   }
 
-  /*
+  /**
    * Check if stored user preferences match declared preferences, and create otherwise
+   * 
+   * This is useful to ensure that all preferences are set for all players
+   * when a new preference is added to the game.
+   * 
+   * This method should be called at the beginning of a game, or when a new preference is added.
    */
   public static function checkExistence()
   {
@@ -96,8 +101,11 @@ class Preferences extends \FOO\Helpers\DB_Manager
       ->toArray();
   }
 
-  /*
+  /**
    * Get a user preference
+   * 
+   * @param int $pId Player ID
+   * @param int $prefId Preference ID
    */
   public static function get($pId, $prefId)
   {
@@ -108,8 +116,11 @@ class Preferences extends \FOO\Helpers\DB_Manager
       ->get(true)['pref_value'] ?? null;
   }
 
-  /*
+  /**
    * Set a user preference
+   * 
+   * @param int $pId Player ID
+   * @param int $prefId Preference ID
    */
   public static function set($pId, $prefId, $value)
   {

@@ -4,6 +4,40 @@
  */
 
 define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], function (dojo, declare) {
+  /**
+   * Configuration object for the modal module.
+   *
+   * @typedef {Object} CONFIG
+   * @property {string} container - The container element ID where the modal will be appended.
+   * @property {string} class - The CSS class name for the modal.
+   * @property {boolean} autoShow - Determines whether the modal should be automatically shown when created.
+   * @property {string} modalTpl - The HTML template for the modal.
+   * @property {string} closeIcon - The CSS class name for the close icon. Set to null if no icon is needed.
+   * @property {string} closeIconTpl - The HTML template for the close icon.
+   * @property {string} closeAction - The action to be performed when the close icon or underlay is clicked. Can be 'destroy' or 'hide'.
+   * @property {boolean} closeWhenClickOnUnderlay - Determines whether the modal should be closed when the underlay is clicked.
+   * @property {string} helpIcon - The CSS class name for the help icon. Set to null if no icon is needed.
+   * @property {string} helpLink - The link URL for the help icon.
+   * @property {string} helpIconTpl - The HTML template for the help icon.
+   * @property {string} title - The title of the modal. Set to null if no title is needed.
+   * @property {string} titleTpl - The HTML template for the title.
+   * @property {string} contentsTpl - The HTML template for the contents of the modal.
+   * @property {string} contents - The contents of the modal.
+   * @property {string} verticalAlign - The vertical alignment of the modal. Can be 'top', 'center', or 'bottom'.
+   * @property {number} animationDuration - The duration of the modal animation in milliseconds.
+   * @property {boolean} fadeIn - Determines whether the modal should fade in when shown.
+   * @property {boolean} fadeOut - Determines whether the modal should fade out when hidden.
+   * @property {boolean} openAnimation - Determines whether the modal should have an open animation.
+   * @property {string} openAnimationTarget - The target element ID for the open animation.
+   * @property {number} openAnimationDelta - The delta value for the open animation.
+   * @property {function} onShow - The callback function to be executed when the modal is shown.
+   * @property {function} onHide - The callback function to be executed when the modal is hidden.
+   * @property {string} statusElt - The element ID to add/remove the "opened" class on.
+   * @property {number} scale - The scale value for the modal.
+   * @property {number} breakpoint - The breakpoint value for auto resizing the modal.
+   * @property {number} vscale - The vertical scale value for the modal.
+   * @property {number} vbreakpoint - The vertical breakpoint value for auto resizing the modal.
+   */
   const CONFIG = {
     container: 'ebd-body',
     class: 'custom_popin',
@@ -67,13 +101,30 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
 
   return declare('customgame.modal', null, {
     _open: false,
+    /**
+     * Checks if the modal is currently displayed.
+     *
+     * @returns {boolean} True if the modal is displayed, false otherwise.
+     */
     isDisplayed() {
       return this._open;
     },
+    /**
+     * Checks if the modal is created.
+     *
+     * @returns {boolean} True if the modal is created, false otherwise.
+     */
     isCreated() {
       return this.id != null;
     },
 
+    /**
+     * Creates a modal instance.
+     *
+     * @param {string} id - The ID of the modal.
+     * @param {object} config - The configuration object for the modal.
+     * @throws {string} - Throws an error if the ID is not provided.
+     */
     constructor(id, config) {
       if (typeof id == 'undefined') {
         console.error('You need an ID to create a modal');
@@ -91,7 +142,7 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
       if (this.autoShow) this.show();
     },
 
-    /*
+    /**
      * Create : create underlay and modal div, and contents
      */
     create() {
@@ -162,6 +213,9 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
       }
     },
 
+    /**
+     * Adjusts the size of the modal container based on its content and breakpoints.
+     */
     adjustSize() {
       let bdy = dojo.position(this.container);
       dojo.style('popin_' + this.id + '_container', {
@@ -186,6 +240,13 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
       }
     },
 
+    /**
+     * Returns the coordinates of the opening target center.
+     *
+     * @returns {Object} The coordinates of the opening target center.
+     * @property {number} x - The x-coordinate of the center.
+     * @property {number} y - The y-coordinate of the center.
+     */
     getOpeningTargetCenter() {
       var startTop, startLeft;
       if (this.openAnimationTarget == null) {
@@ -203,8 +264,10 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
       };
     },
 
-    /*
+    /**
      * Fadein promise
+     *
+     * @returns {Promise} A promise that resolves when the fadein animation is done.
      */
     fadeInAnimation() {
       return new Promise((resolve, reject) => {
@@ -257,6 +320,9 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
       });
     },
 
+    /**
+     * Shows the modal.
+     */
     show() {
       if (this._isOpening) return;
 
@@ -278,8 +344,10 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
       });
     },
 
-    /*
+    /**
      * Fadeout promise
+     *
+     * @returns {Promise} A promise that resolves when the fadeout animation is done.
      */
     fadeOutAnimation() {
       return new Promise((resolve, reject) => {
@@ -329,7 +397,7 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
       });
     },
 
-    /*
+    /**
      * Hide : hide the modal without destroying it
      */
     hide() {
@@ -354,7 +422,7 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
       });
     },
 
-    /*
+    /**
      * Destroy : destroy the object and all DOM elements
      */
     destroy() {
@@ -371,7 +439,7 @@ define(['dojo', 'dojo/_base/declare', 'dojo/fx', 'dojox/fx/ext-dojo/complex'], f
       });
     },
 
-    /*
+    /**
      * Kill : destroy the object and all DOM elements
      */
     kill() {

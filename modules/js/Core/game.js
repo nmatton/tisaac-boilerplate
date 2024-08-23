@@ -1,6 +1,13 @@
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 var debug = isDebug ? console.info.bind(window.console) : function () {};
 
+/**
+ * Retrieves the full matrix transformation of an element.
+ * If no element is provided, returns a new identity matrix.
+ *
+ * @param {Element} element - The element to retrieve the matrix transformation from.
+ * @returns {DOMMatrix} The full matrix transformation of the element.
+ */
 function getFullMatrix(element) {
   if (!element) return new DOMMatrix();
   const css = getComputedStyle(element).transform;
@@ -38,6 +45,13 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       });
     },
 
+    /**
+     * Displays a message and logs it as an error if the type is 'error'.
+     *
+     * @param {string} msg - The message to be displayed.
+     * @param {string} type - The type of the message.
+     * @returns {any} - The result of calling the inherited function.
+     */
     showMessage(msg, type) {
       if (type == 'error') {
         console.error(msg);
@@ -45,10 +59,20 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       return this.inherited(arguments);
     },
 
+    /**
+     * Returns whether the game is in fast mode (meaning that animations are disabled for fast replay).
+     *
+     * see this blog post for more information: https://bga-devs.github.io/blog/posts/a-real-fast-replay-mode/
+     *
+     * @returns {boolean} True if the game is in fast mode, false otherwise.
+     */
     isFastMode() {
       return this.instantaneousMode;
     },
 
+    /**
+     * Sets the mode to instantaneous.
+     */
     setModeInstataneous() {
       if (this.instantaneousMode == false) {
         this.instantaneousMode = true;
@@ -58,6 +82,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       }
     },
 
+    /**
+     * Unsets the instantaneous mode.
+     */
     unsetModeInstantaneous() {
       if (this.instantaneousMode) {
         this.instantaneousMode = false;
@@ -67,7 +94,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       }
     },
 
-    /*
+    /**
      * [Undocumented] Override BGA framework functions to call onLoadingComplete when loading is done
      */
     setLoader(value, max) {
@@ -78,11 +105,14 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       }
     },
 
+    /**
+     * Callback function called when loading is complete.
+     */
     onLoadingComplete() {
       debug('Loading complete');
     },
 
-    /*
+    /**
      * Setup:
      */
     setup(gamedatas) {
@@ -101,14 +131,14 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       });
     },
 
-    /*
+    /**
      * Detect if spectator or replay
      */
     isReadOnly() {
       return this.isSpectator || typeof g_replayFrom != 'undefined' || g_archive_mode;
     },
 
-    /*
+    /**
      * Make an AJAX call with automatic lock
      */
     takeAction(action, data, check = true, checkLock = true) {
@@ -170,6 +200,10 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       var methodName = 'onLeavingState' + stateName.charAt(0).toUpperCase() + stateName.slice(1);
       if (this[methodName] !== undefined) this[methodName]();
     },
+
+    /**
+     * Clears the title bar by removing action buttons and emptying specific elements.
+     */
     clearTitleBar() {
       this.removeActionButtons();
       this.empty('customActions');
@@ -178,7 +212,15 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       $('gameaction_status').innerHTML = '';
       $('pagemaintitletext').innerHTML = '';
     },
+
+    /**
+     * Clears any pre-animation setup.
+     */
     clearPreAnimation() {},
+
+    /**
+     * Clears the possible selections and resets the game state.
+     */
     clearPossible() {
       this.clearTitleBar();
 
@@ -192,6 +234,11 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       dojo.query('.selected').removeClass('selected');
     },
 
+    /**
+     * Empties the specified container by removing all child nodes and closing any associated tooltips.
+     *
+     * @param {HTMLElement} container - The container element to be emptied.
+     */
     empty(container) {
       container = $(container);
       if (!container) return;
@@ -226,6 +273,12 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     /*
      * setupNotifications
      */
+
+    /**
+     * Returns the visible title container element.
+     *
+     * @returns {HTMLElement} The visible title container element.
+     */
     getVisibleTitleContainer() {
       function isVisible(elem) {
         return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
@@ -238,6 +291,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       }
     },
 
+    /**
+     * Sets up the notifications for the game.
+     */
     setupNotifications() {
       console.log(this._notifications);
       this._notifications.forEach((notif) => {
@@ -287,6 +343,12 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       };
     },
 
+    /**
+     * Ends the notification and sets the synchronous duration.
+     * @function endNotif
+     * @memberof game
+     * @returns {void}
+     */
     endNotif() {
       this.notifqueue.setSynchronousDuration(this.isFastMode() ? 0 : 100);
     },
@@ -340,14 +402,13 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       fetchNextUrl();
     },
 
-    /*
+    /**
      * Add a timer on an action button :
      * params:
      *  - buttonId : id of the action button
      *  - time : time before auto click
      *  - pref : 0 is disabled (auto-click), 1 if normal timer, 2 if no timer and show normal button
      */
-
     startActionTimer(buttonId, time, pref, autoclick = false) {
       var button = $(buttonId);
       var isReadOnly = this.isReadOnly();
@@ -381,6 +442,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       debug('Timer #' + this._actionTimerId + ' ' + buttonId + ' start');
     },
 
+    /**
+     * Stops the action timer.
+     */
     stopActionTimer() {
       if (this._actionTimerId != null) {
         debug('Timer #' + this._actionTimerId + ' stop');
@@ -397,6 +461,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       playNextMoveSound && this.disableNextMoveSound();
     },
 
+    /**
+     * Resets the page title to the one define in the gamestate description/descriptionmyturn
+     */
     resetPageTitle() {
       this.changePageTitle();
     },
@@ -426,7 +493,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       this.updatePageTitle();
     },
 
-    /*
+    /**
      * Remove non standard zoom property
      */
     onScreenWidthChange() {
@@ -436,27 +503,50 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     },
 
     /**
-     * Add a blue/grey button if it doesn't already exists
+     * Adds a *primary* (blue/gray) action button on the action button custom zone
+     *
      * It uses a custom div to avoid BGA auto clearing it on game state change
+     *
+     * @param {string} id - The ID of the button.
+     * @param {string} text - The text to display on the button.
+     * @param {Function} callback - The callback function to execute when the button is clicked.
+     * @param {string} [zone='customActions'] - The zone where the button should be added. Defaults to 'customActions'.
      */
-    addPrimaryActionButton(id, text, callback, zone = 'customActions') {
-      if (!$(id)) this.addActionButton(id, text, callback, zone, false, 'blue');
-    },
-
     addSecondaryActionButton(id, text, callback, zone = 'customActions') {
       if (!$(id)) this.addActionButton(id, text, callback, zone, false, 'gray');
     },
 
+    /**
+     * Adds a *Danger* (red) action button on the action button custom zone
+     *
+     * It uses a custom div to avoid BGA auto clearing it on game state change
+     *
+     * @param {string} id - The ID of the button.
+     * @param {string} text - The text to display on the button.
+     * @param {Function} callback - The callback function to execute when the button is clicked.
+     * @param {string} [zone='customActions'] - The zone where the button should be added. Defaults to 'customActions'.
+     */
     addDangerActionButton(id, text, callback, zone = 'customActions') {
       if (!$(id)) this.addActionButton(id, text, callback, zone, false, 'red');
     },
 
+    /**
+     * Clears the action buttons.
+     */
     clearActionButtons() {
       dojo.empty('customActions');
     },
 
     /*
      * Preference polyfill
+     */
+    /**
+     * Sets the preference value
+     *
+     * @param {number} number - The number of the preference.
+     * @param {any} newValue - The new value for the preference.
+     *
+     * Note: This function might needs to be deprecated with the new BGA framework.
      */
     setPreferenceValue(number, newValue) {
       var optionSel = 'option[value="' + newValue + '"]';
@@ -475,6 +565,13 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       }
     },
 
+    /**
+     * Initializes the preferences observer.
+     *
+     * @returns {void}
+     *
+     * Note: This function might needs to be deprecated with the new BGA framework.
+     */
     initPreferencesObserver() {
       dojo.query('.preference_control, preference_fontrol').on('change', (e) => {
         var match = e.target.id.match(/^preference_[fc]ontrol_(\d+)$/);
@@ -498,6 +595,13 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       });
     },
 
+    /**
+     * Checks the consistency of preferences.
+     *
+     * @param {Array} backPrefs - The array of preference information.
+     *
+     * Note: This function might needs to be deprecated with the new BGA framework.
+     */
     checkPreferencesConsistency(backPrefs) {
       backPrefs.forEach((prefInfo) => {
         let pref = prefInfo.pref_id;
@@ -508,9 +612,26 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       });
     },
 
+    /**
+     * Handles the change of a preference.
+     *
+     * @param {string} pref - The preference that has changed.
+     * @param {any} newValue - The new value of the preference.
+     *
+     *  Note: This function might needs to be deprecated with the new BGA framework.
+     */
     onPreferenceChange(pref, newValue) {},
 
-    // Init preferences will setup local preference and put the corresponding data-attribute on overall-content div if needed
+    /**
+     * Initializes the preferences for the game.
+     *
+     * This method attaches data attributes on the overall-content div based on the preferences.
+     * It also creates local preferences if the game is not read-only and there are local preferences available.
+     * The method sets up preference observers and checks the consistency of preferences.
+     * Finally, it calls the setupSettings method.
+     *
+     *  Note: This function might needs to be deprecated with the new BGA framework.
+     */
     initPreferences() {
       // Attach data attribute on overall-content div
       Object.keys(this.prefs).forEach((prefId) => {
@@ -543,6 +664,12 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       this.setupSettings();
     },
 
+    /**
+     * Template for a preference select element.
+     *
+     * @param {Object} pref - The preference object.
+     * @returns {string} The rendered HTML string.
+     */
     tplPreferenceSelect(pref) {
       let values = Object.keys(pref.values)
         .map(
@@ -574,10 +701,17 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     /************************
      ******* SETTINGS ********
      ************************/
+    /**
+     * Checks if the current environment is mobile.
+     * @returns {boolean} True if the current environment is mobile, false otherwise.
+     */
     isMobile() {
       return $('ebd-body').classList.contains('mobile_version');
     },
 
+    /**
+     * Sets up the game settings window (cog icon on top of player panels) which opens a modal with settings.
+     */
     setupSettings() {
       dojo.connect($('show-settings'), 'onclick', () => this.toggleSettings());
       this.addTooltip('show-settings', '', _('Display some settings about the game.'));
@@ -676,6 +810,13 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       });
     },
 
+    /**
+     * Changes the value of a game setting and performs necessary actions.
+     *
+     * @param {string} settingName - The name of the setting to be changed.
+     * @param {any} value - The new value for the setting.
+     * @returns {void}
+     */
     changeSetting(settingName, value) {
       let suffix = settingName.charAt(0).toUpperCase() + settingName.slice(1);
       this.settings[settingName] = value;
@@ -686,6 +827,14 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       }
     },
 
+    /**
+     * Generates a setting slider HTML template.
+     *
+     * @param {Object} setting - The setting object.
+     * @param {string} setting.id - The ID of the setting.
+     * @param {string} setting.desc - The description of the setting.
+     * @returns {string} The generated HTML template.
+     */
     tplSettingSlider(setting) {
       return `
       <div class='row-data row-data-large' data-id='${setting.id}'>
@@ -697,6 +846,14 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       `;
     },
 
+    /**
+     * Generates the HTML template for a setting switch.
+     *
+     * @param {Object} setting - The setting object.
+     * @param {string} setting.id - The ID of the setting.
+     * @param {string} setting.name - The name of the setting.
+     * @returns {string} The HTML template for the setting switch.
+     */
     tplSettingSwitch(setting) {
       return `
       <div class='row-data row-data-large row-data-switch' data-id='${setting.id}'>
@@ -713,6 +870,12 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       `;
     },
 
+    /**
+     * Generates a setting select template.
+     *
+     * @param {Object} setting - The setting object.
+     * @returns {string} - The generated template.
+     */
     tplSettingSelect(setting) {
       let values = Object.keys(setting.values)
         .map(
@@ -739,6 +902,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       `;
     },
 
+    /**
+     * Toggles the settings modal.
+     */
     toggleSettings() {
       if (!this._settingsModal) return;
 
@@ -758,6 +924,11 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       */
     },
 
+    /**
+     * Calculates the scale of an element based on its transform property.
+     * @param {string} id - The ID of the element.
+     * @returns {number} The scale of the element.
+     */
     getScale(id) {
       let transform = dojo.style(id, 'transform');
       if (transform == 'none') return 1;
@@ -770,12 +941,24 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       return Math.sqrt(a * a + b * b);
     },
 
+    /**
+     * Waits for a specified amount of time.
+     * @param {number} n - The duration to wait in milliseconds.
+     * @returns {Promise<void>} - A promise that resolves after the specified duration.
+     */
     wait(n) {
       return new Promise((resolve, reject) => {
         setTimeout(() => resolve(), n);
       });
     },
 
+    /**
+     * Positions the given mobile object directly at the specified coordinates.
+     *
+     * @param {HTMLElement} mobileObj - The mobile object to be positioned.
+     * @param {number} x - The x-coordinate to position the object at.
+     * @param {number} y - The y-coordinate to position the object at.
+     */
     positionObjectDirectly(mobileObj, x, y) {
       // do not remove this "dead" code some-how it makes difference
       dojo.style(mobileObj, 'left'); // bug? re-compute style
@@ -787,8 +970,12 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       dojo.style(mobileObj, 'left'); // bug? re-compute style
     },
 
-    /*
+    /**
      * Wrap a node inside a flip container to trigger a flip animation before replacing with another node
+     *
+     * @param {HTMLElement} target - The target node to be replaced.
+     * @param {HTMLElement} newNode - The new node to replace the target with.
+     * @param {number} [duration=1000] - The duration of the flip animation in milliseconds.
      */
     flipAndReplace(target, newNode, duration = 1000) {
       // Fast replay mode
@@ -824,8 +1011,10 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       });
     },
 
-    /*
-     * Return a span with a colored 'You'
+    /**
+     * Return a span with a colored 'You' as HTML string
+     *
+     * @returns {string} - The HTML string with the colored 'You' span.
      */
     coloredYou() {
       var color = this.gamedatas.players[this.player_id].color;
@@ -844,6 +1033,12 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       return you;
     },
 
+    /**
+     * Returns a colored player name.
+     *
+     * @param {string} name - The name of the player.
+     * @returns {string} The colored player name.
+     */
     coloredPlayerName(name) {
       const player = Object.values(this.gamedatas.players).find((player) => player.name == name);
       if (player == undefined) return '<!--PNS--><span class="playername">' + name + '</span><!--PNE-->';
@@ -857,8 +1052,12 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       );
     },
 
-    /*
-     * Overwrite to allow to more player coloration than player_name and player_name2
+    /**
+     * Overwrite the BGA method to allow to more player coloration than player_name and player_name2
+     *
+     * @param {string} log - The log message.
+     * @param {object} args - The arguments to be formatted.
+     * @returns {string} The formatted string.
      */
     format_string_recursive(log, args) {
       try {
@@ -879,6 +1078,14 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       return this.inherited(arguments);
     },
 
+    /**
+     * Place a template inside a container
+     *
+     * @param {string} tplMethodName - The name of the template method.
+     * @param {object} object - The object to be passed to the template.
+     * @param {string} container - The container where the template should be placed.
+     * @param {string} [position=null] - The position where the template should be placed. (string refers to "replace", "last" (default), etc.; number refers to the n-th child)
+     */
     place(tplMethodName, object, container, position = null) {
       if ($(container) == null) {
         console.error('Trying to place on null container', container, tplMethodName, object);
@@ -893,7 +1100,13 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       return dojo.place(this[tplMethodName](object), container, position);
     },
 
-    /* Helper to work with local storage */
+    /**
+     * Helper to work with local storage
+     *
+     * @param {string} value - The value to get from local storage.
+     * @param {any} v - The default value to return if the value is not found in local storage.
+     * @returns {any} The value from local storage or the default value.
+     */
     getConfig(value, v) {
       return localStorage.getItem(value) == null || isNaN(localStorage.getItem(value))
         ? v
@@ -911,6 +1124,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       else this.desactivateHelpMode();
     },
 
+    /**
+     * Activates the help mode.
+     */
     activateHelpMode() {
       this._helpMode = true;
       dojo.addClass('ebd-body', 'help-mode');
@@ -918,6 +1134,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       document.body.addEventListener('click', this.closeCurrentTooltip.bind(this));
     },
 
+    /**
+     * Deactivates the help mode.
+     */
     desactivateHelpMode() {
       this.closeCurrentTooltip();
       this._helpMode = false;
@@ -925,6 +1144,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       document.body.removeEventListener('click', this.closeCurrentTooltip.bind(this));
     },
 
+    /**
+     * Closes the current tooltip.
+     */
     closeCurrentTooltip() {
       if (this._showTooltipTimeout != null) clearTimeout(this._showTooltipTimeout);
 
@@ -935,14 +1157,26 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       }
     },
 
-    /*
+    /**
      * Custom connect that keep track of all the connections
      *  and wrap clicks to make it work with help mode
+     *
+     * @param {HTMLElement} node - The node to connect.
+     * @param {string} action - The action to connect.
+     * @param {Function} callback - The callback function to execute.
      */
     connect(node, action, callback) {
       this._connections.push(dojo.connect($(node), action, callback));
     },
 
+    /**
+     * Handles the click event on a given node.
+     *
+     * @param {HTMLElement} node - The node to attach the click event to.
+     * @param {Function} callback - The callback function to be executed on click.
+     * @param {boolean} [temporary=true] - Indicates whether the click event should be temporary or not.
+     * @returns {void}
+     */
     onClick(node, callback, temporary = true) {
       let safeCallback = (evt) => {
         evt.stopPropagation();
@@ -969,6 +1203,10 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       this._registeredCustomTooltips[id] = html;
       return id;
     },
+
+    /**
+     * Attaches registered tooltips to the elements.
+     */
     attachRegisteredTooltips() {
       Object.keys(this._registeredCustomTooltips).forEach((id) => {
         if ($(id)) {
@@ -977,6 +1215,18 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       });
       this._registeredCustomTooltips = {};
     },
+
+    /**
+     * Adds a custom tooltip to the specified element.
+     *
+     * @param {string} id - The ID of the element to attach the tooltip to.
+     * @param {string|Function} html - The HTML content or a function that returns the HTML content of the tooltip.
+     * @param {Object} [config={}] - The configuration options for the tooltip.
+     * @param {number} [config.delay=400] - The delay in milliseconds before showing the tooltip.
+     * @param {boolean} [config.midSize=true] - Whether to apply the "midSizeDialog" class to the tooltip content.
+     * @param {boolean} [config.forceRecreate=false] - Whether to force recreate the tooltip if it already exists.
+     * @param {boolean} [config.openOnClick=false] - Whether to open the tooltip on click instead of hover.
+     */
     addCustomTooltip(id, html, config = {}) {
       config = Object.assign(
         {
@@ -1057,6 +1307,12 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       });
     },
 
+    /**
+     * Destroys the given element.
+     *
+     * @param {HTMLElement} elem - The element to be destroyed.
+     * @returns {void}
+     */
     destroy(elem) {
       if (!elem) return;
 
@@ -1068,9 +1324,11 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       elem.remove();
     },
 
-    /*
+    /**
      * [Undocumented] Called by BGA framework on any notification message
-     * Handle cancelling log messages for restart turn
+     * Handle cancelling log messages for restart turn (Undo)
+     *
+     * @param {Object} msg - The notification message.
      */
     onPlaceLogOnChannel(msg) {
       var currentLogId = this.notifqueue.next_log_id;
@@ -1086,9 +1344,11 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       return res;
     },
 
-    /*
+    /**
      * cancelLogs:
      *   strikes all log messages related to the given array of notif ids
+     *
+     * @param {Array} notifIds - The array of notification IDs to cancel.
      */
     checkLogCancel(notifId) {
       if (this.gamedatas.canceledNotifIds != null && this.gamedatas.canceledNotifIds.includes(notifId)) {
@@ -1096,6 +1356,11 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       }
     },
 
+    /**
+     * Cancels logs based on the provided notification IDs.
+     *
+     * @param {Array} notifIds - An array of notification IDs.
+     */
     cancelLogs(notifIds) {
       notifIds.forEach((uid) => {
         if (this._notif_uid_to_log_id.hasOwnProperty(uid)) {
@@ -1109,6 +1374,15 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       });
     },
 
+    /**
+     * Adds a log class to the element based on the last notification.
+     * If the last notification is null, the function returns early.
+     * The log class is determined by the type of the notification message.
+     * If the type is 'history_history', the original type is used instead.
+     * If an element with the log ID exists, it adds the appropriate notification class.
+     * It also calls the corresponding 'onAdding<Type>ToLog' method if it exists.
+     * If an element with the mobile log ID exists, it adds the appropriate notification class.
+     */
     addLogClass() {
       if (this._last_notif == null) return;
 
@@ -1129,6 +1403,10 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
 
     /**
      * Own counter implementation that works with replay
+     *
+     * @param {string} id - The ID of the counter.
+     * @param {number} [defaultValue=0] - The default value of the counter.
+     * @param {string} [linked=null] - The ID of the linked counter.
      */
     createCounter(id, defaultValue = 0, linked = null) {
       if (!$(id)) {
@@ -1194,14 +1472,31 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     /****************
      ***** UTILS *****
      ****************/
+    /**
+     * Iterates over each player in the game and executes the provided callback function.
+     *
+     * @param {Function} callback - The callback function to be executed for each player.
+     */
     forEachPlayer(callback) {
       Object.values(this.gamedatas.players).forEach(callback);
     },
 
+    /**
+     * Retrieves the arguments of the current game state.
+     *
+     * @returns {any} The arguments of the current game state.
+     */
     getArgs() {
       return this.gamedatas.gamestate.args;
     },
 
+    /**
+     * Sets the client state with the given name, description, and arguments.
+     *
+     * @param {string} name - The name of the client state.
+     * @param {string} description - The description of the client state.
+     * @param {any[]} args - The arguments of the client state.
+     */
     clientState(name, descriptionmyturn, args) {
       this.setClientState(name, {
         descriptionmyturn,
@@ -1209,10 +1504,23 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       });
     },
 
+    /**
+     * Replaces placeholders in a string with corresponding values.
+     *
+     * @param {string} str - The string containing placeholders.
+     * @param {Object} subst - The object containing key-value pairs to replace the placeholders.
+     * @returns {string} - The modified string with placeholders replaced.
+     */
     strReplace(str, subst) {
       return dojo.string.substitute(str, subst);
     },
 
+    /**
+     * Adds a cancel state button.
+     *
+     * @param {string} [text=null] - The text to display on the button. If not provided, the default text "Cancel" will be used.
+     * @returns {void}
+     */
     addCancelStateBtn(text = null) {
       if (text == null) {
         text = _('Cancel');
@@ -1221,11 +1529,20 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       this.addSecondaryActionButton('btnCancel', text, () => this.clearClientState(), 'restartAction');
     },
 
+    /**
+     * Clears the client state by restoring the server game state.
+     */
     clearClientState() {
       //this.clearPossible();
       this.restoreServerGameState();
     },
 
+    /**
+     * use the BGA framework "format_string_recursive" method to translate a string or object.
+     *
+     * @param {string|object} t - The string or object to be translated.
+     * @returns {string} The translated string.
+     */
     translate(t) {
       if (typeof t === 'object') {
         return this.format_string_recursive(_(t.log), t.args);
@@ -1234,10 +1551,37 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       }
     },
 
+    /**
+     * Formats a string recursively.
+     *
+     * @param {string} log - The string to format.
+     * @param {any[]} args - The arguments to replace in the string.
+     * @returns {string} The formatted string.
+     */
     fsr(log, args) {
       return this.format_string_recursive(log, args);
     },
 
+    /**
+     * Handles the selection of elements based on the provided options.
+     *
+     * @param {Object} options - The configuration options for the selection.
+     * @param {Array} options.elements - The elements to be selected from.
+     * @param {number} options.n - The number of elements to be selected.
+     * @param {boolean} options.autoConfirm - Determines if the selection should be automatically confirmed.
+     * @param {string} options.confirmText - The text for the confirm button.
+     * @param {boolean} options.confirmBtn - Determines if the confirm button should be displayed.
+     * @param {string} options.cancelText - The text for the cancel button.
+     * @param {boolean} options.cancelBtn - Determines if the cancel button should be displayed.
+     * @param {Function} options.callback - The callback function to be executed when the selection is confirmed.
+     * @param {Function} options.updateCallback - The callback function to be executed when the selection is updated.
+     * @param {boolean} options.upTo - Determines if the selection can be up to the specified number.
+     * @param {boolean} options.canPass - Determines if a pass action button should be displayed.
+     * @param {Function} options.passCallback - The callback function to be executed when the pass action button is clicked.
+     * @param {string} options.btnContainer - The ID of the container element for the action buttons.
+     * @param {string} options.class - The CSS class to be applied to the selected elements.
+     * @param {Array} options.preselectedElements - The elements that are preselected.
+     */
     onSelectN(options) {
       let config = Object.assign(
         {
@@ -1342,6 +1686,12 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     //////////////////////////
 
     // FIX PLACE ON OBJECT BGA FUNCTION SO THAT IT TAKES SCALE INTO ACCOUNT
+    /**
+     * Places a mobile object on a target object.
+     *
+     * @param {Element|string} t - The mobile object to be placed. It can be either an element or a selector string.
+     * @param {Element} i - The target object on which the mobile object will be placed.
+     */
     placeOnObject(t, i) {
       null === t && console.error('placeOnObject: mobile obj is null');
       null === i && console.error('placeOnObject: target obj is null');
@@ -1367,6 +1717,15 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     },
 
     // FIX SLIDE TO OBJECT BGA FUNCTION SO THAT IT TAKES SCALE INTO ACCOUNT
+    /**
+     * Slides an object to a target object.
+     *
+     * @param {HTMLElement|string} t - The mobile object or its selector.
+     * @param {HTMLElement} i - The target object.
+     * @param {number} [n=500] - The duration of the slide animation in milliseconds.
+     * @param {number} [o=0] - The delay before starting the slide animation in milliseconds.
+     * @returns {dojo.Animation} - The slide animation.
+     */
     slideToObject(t, i, n, o) {
       null === t && console.error('slideToObject: mobile obj is null');
       null === i && console.error('slideToObject: target obj is null');
@@ -1406,6 +1765,14 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     },
 
     // CHANGE PARENT ALLOWS TO CHANGE AN OBJECT ATTACH WITHOUT CHANGING ITS POS
+    /**
+     * Moves the specified mobile object to a new parent element and updates its position.
+     *
+     * @param {string|HTMLElement} mobile - The mobile object to be moved. Can be either a string representing the ID of the element or the element itself.
+     * @param {string|HTMLElement} new_parent - The new parent element where the mobile object will be attached. Can be either a string representing the ID of the element or the element itself.
+     * @param {string} [relation='last'] - The relation of the mobile object to the new parent element. Defaults to 'last'.
+     * @returns {Object} - The updated box object containing the left, top, width, and height properties of the mobile object.
+     */
     changeParent(mobile, new_parent, relation) {
       if (mobile === null) {
         console.error('attachToNewParent: mobile obj is null');
@@ -1449,6 +1816,27 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       return box;
     },
 
+    /**
+     * Slides a mobile element to a target element with optional configuration options.
+     *
+     * @param {HTMLElement} mobileElt - The mobile element to slide.
+     * @param {HTMLElement} targetElt - The target element to slide to.
+     * @param {Object} options - The configuration options for the slide animation.
+     * @param {number} options.duration - The duration of the slide animation in milliseconds. Default is 800.
+     * @param {number} options.delay - The delay before starting the slide animation in milliseconds. Default is 0.
+     * @param {boolean} options.destroy - Whether to destroy the mobile element after sliding. Default is false.
+     * @param {boolean} options.attach - Whether to attach the mobile element to the target element after sliding. Default is true.
+     * @param {boolean} options.changeParent - Whether to change the parent of the mobile element during sliding to avoid zIndex issue. Default is true.
+     * @param {HTMLElement} options.animationParent - The parent element for the slide animation. Default is null.
+     * @param {Object} options.pos - The position to slide the mobile element to. Default is null.
+     * @param {string} options.className - The class name to add to the mobile element during sliding. Default is 'moving'.
+     * @param {HTMLElement} options.from - The starting element for the slide animation. Default is null.
+     * @param {boolean} options.clearPos - Whether to clear the position of the mobile element after sliding. Default is true.
+     * @param {HTMLElement} options.beforeBrother - The sibling element to place the target element before. Default is null.
+     * @param {HTMLElement} options.to - The target element to slide to. Default is null.
+     * @param {boolean} options.phantom - Whether to create a phantom element during sliding. Default is true.
+     * @returns {Promise} A promise that resolves when the slide animation is complete.
+     */
     slide(mobileElt, targetElt, options = {}) {
       let config = Object.assign(
         {

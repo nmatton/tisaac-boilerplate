@@ -167,7 +167,7 @@ class Notifications
   //  \___/| .__/ \__,_|\__,_|\__\___| /_/   \_\_|  \__, |___/
   //       |_|                                      |___/
   ///////////////////////////////////////////////////////////////
-  /*
+  /**
    * Automatically adds some standard field about player and/or card to the args
    * (to avoid having to do it manually in each notification)
    * example : 
@@ -179,6 +179,7 @@ class Notifications
    * 
    * You can do the same for many other purposes and update the args in this function (examples with card and task are commented)
    * 
+   * @param array $args
    */
   protected static function updateArgs(&$args)
   {
