@@ -1,2 +1,2 @@
-Cached DB Manager module
+CachedDB_Manager Module
 ========================

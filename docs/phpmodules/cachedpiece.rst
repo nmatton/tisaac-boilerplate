@@ -1,3 +1,3 @@
-Cached Pieces Module
+CachedPiece Module
 =====================
 

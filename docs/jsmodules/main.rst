@@ -1,5 +1,5 @@
-JS module Documentation
-=======================
+JS module
+=========
 
 This is a complete documentation of the JS module and its components.
 
