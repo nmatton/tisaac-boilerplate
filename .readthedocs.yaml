@@ -16,10 +16,7 @@ build:
   apt_packages:
     - nodejs
     - npm
-
-  jobs:
-    post_system_dependencies:
-      - npm install -g jsdoc # Install jsdoc globally
+    - sphinx-js
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
