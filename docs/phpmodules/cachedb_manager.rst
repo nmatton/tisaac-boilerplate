@@ -1,0 +1,2 @@
+Cached DB Manager module
+========================
