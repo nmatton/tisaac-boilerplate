@@ -19,6 +19,8 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.autosectionlabel",
+    'hoverxref.extension',
     'sphinx_rtd_theme',
     'sphinxcontrib.phpdomain',
     'sphinx_js']
@@ -26,7 +28,9 @@ extensions = [
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
+# Make sure the target is unique
+autosectionlabel_prefix_document = True
+hoverxref_domains = ['php']
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

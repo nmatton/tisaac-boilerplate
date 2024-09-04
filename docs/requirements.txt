@@ -2,3 +2,4 @@ myst-parser==4.0.0
 sphinx_rtd_theme==2.0.0
 sphinxcontrib-phpdomain==0.12.0
 sphinx_js==3.2.2
+sphinx-hoverxref==1.4.0

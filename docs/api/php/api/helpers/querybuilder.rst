@@ -1,9 +1,12 @@
 QueryBuilder
 ============
 
-:Qualified name: ``FOO\Helpers\QueryBuilder``
+.. php:namespace:: FOO\Helpers\QueryBuilder
+
 
 .. php:class:: QueryBuilder
+
+.. _targetQ:
 
   .. php:method:: public __construct ($table[, $cast, $primary, $log])
 
@@ -36,7 +39,7 @@ QueryBuilder
   .. php:method:: public func ($func[, $field]) -> int
 
     Retrieves a single value from the database (e.g. COUNT, MAX, MIN).
-ONLY for unary function : COUNT, MAX, MIN
+    ONLY for unary function : COUNT, MAX, MIN
 
     :param $func:
     :param $field:

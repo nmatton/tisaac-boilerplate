@@ -34,11 +34,11 @@ Some **CLI** tools are also included such as scripts to work at multiple develop
 Where to Start?
 ===============
 
-The best place to start is by reading the `Quickstart` guide, which will introduce you to the basic concepts of the boilerplate and how to use it. 
-The `Overview` will provide a general understanding of the boilerplate, its components, and how they are organized.
-Finally, the `Tutorial` section will walk you through the implementation of a simple game using the boilerplate.
+The best place to start is by reading the `quickstart <quickstart.html>`_ guide, which will introduce you to the basic concepts of the boilerplate and how to use it. 
+The `overview <overview.html>`_ will provide a general understanding of the boilerplate, its components, and how they are organized.
+Finally, the `tutorial <tutorial.html>`_ section will walk you through the implementation of a simple game using the boilerplate.
 
-If you are more advanced or familiar with the boilerplate, you can jump directly to the `API Reference`.
+If you are more advanced or familiar with the boilerplate, you can jump directly to the `API Reference <api/apiref.html>`_.
 
 
 .. toctree::
