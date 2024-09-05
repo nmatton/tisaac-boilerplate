@@ -6,6 +6,8 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import os, sys; sys.path.insert(0,os.path.abspath('./hoverxref'))
+
 project = "Tisaac's boilerplate"
 copyright = '2024, Tisaac, nicotacotac, other(s)'
 author = 'Tisaac, nicotacotac, other(s)'
@@ -20,7 +22,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosectionlabel",
-    'hoverxref.extension',
+    'hoverxref',
     'sphinx_rtd_theme',
     'sphinxcontrib.phpdomain',
     'sphinx_js']

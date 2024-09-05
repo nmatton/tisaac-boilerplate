@@ -37,7 +37,8 @@ Initialization
 
 To start using QueryBuilder, you need to create an :hoverxref:`instance for a specific table <targetQ>`:
 
-The constructor (:php:class:`FOO\\Helpers\\QueryBuilder\\QueryBuilder::__construct`) takes the table name as mandatory parameters and 3 optionnal parameters: 
+The constructor (:php:meth:`FOO\\Helpers\\QueryBuilder\\QueryBuilder::__construct`) takes the table name as mandatory parameters and 3 optionnal parameters: 
+
 
 1. $cast : the type you want the result to be casted to. Can be a callable (int, str, etc.) , 'object' or a class. Default is null (no casting)
 2. $primary : the primary key of the table. Default is 'id'
@@ -46,6 +47,7 @@ The constructor (:php:class:`FOO\\Helpers\\QueryBuilder\\QueryBuilder::__constru
 Example:
 
 .. code-block:: php
+
     $ships = new QueryBuilder('ships', Ship::class, 'id', true);
 
 In that case, the result of the query will be casted to the Ship class.
@@ -78,6 +80,7 @@ Note that the `get()` method returns a Collection object, which can be further m
 The `getSingle()` method can be used to retrieve a single record.
 
 .. _complex_select:
+
 2. **SELECT with conditions**:
 
 There is a variety of methods to build complex queries with conditions:
@@ -236,11 +239,8 @@ When using the QueryBuilder module, consider the following best practices:
 1. **Use parameter binding**: The QueryBuilder handles this automatically, preventing SQL injection.
 2. **Chain methods logically**: Build your query in a logical order for readability.
 3. **Use appropriate methods**: Choose specific methods like `whereIn()` or `whereNull()` when applicable.
-4. **Be aware of performance**: Complex queries or large datasets might require optimization.
-5. **Utilize logging**: Enable logging for debugging and auditing purposes.
-6. **Understand return types**: Methods like `get()` return collections, while `getSingle()` returns a single record.
-7. **Handle potential errors**: Some operations might throw exceptions, so implement proper error handling.
-
+4. **Understand return types**: Methods like `get()` return collections, while `getSingle()` returns a single record.
+5. **Handle potential errors**: Some operations might throw exceptions, so implement proper error handling.
 
 
 
