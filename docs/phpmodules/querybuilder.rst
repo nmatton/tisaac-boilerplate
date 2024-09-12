@@ -39,6 +39,7 @@ To start using QueryBuilder, you need to create an :hoverxref:`instance for a sp
 
 The constructor (:php:meth:`FOO\\Helpers\\QueryBuilder\\QueryBuilder::__construct`) takes the table name as mandatory parameters and 3 optionnal parameters: 
 
+.. _qb_cast:
 
 1. $cast : the type you want the result to be casted to. Can be a callable (int, str, etc.) , 'object' or a class. Default is null (no casting)
 2. $primary : the primary key of the table. Default is 'id'

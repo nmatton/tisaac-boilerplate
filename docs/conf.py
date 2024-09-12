@@ -6,7 +6,11 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-import os, sys; sys.path.insert(0,os.path.abspath('./hoverxref'))
+from pygments.lexers.web import PhpLexer
+from sphinx.highlighting import lexers
+import os
+import sys
+sys.path.insert(0, os.path.abspath('./hoverxref'))
 
 project = "Tisaac's boilerplate"
 copyright = '2024, Tisaac, nicotacotac, other(s)'
@@ -41,8 +45,6 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 
 # -- Setup for PHP formatting ------------------------------------------------
-from sphinx.highlighting import lexers
-from pygments.lexers.web import PhpLexer
 lexers['php'] = PhpLexer(startinline=True, linenos=1)
 lexers['php-annotations'] = PhpLexer(startinline=True, linenos=1)
 
