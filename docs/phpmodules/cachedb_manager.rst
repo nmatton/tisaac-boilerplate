@@ -3,6 +3,7 @@ CachedDB_Manager & DB_Model Modules
 
 The CachedDB_Manager and DB_Model classes are designed to provide an efficient and convenient way to interact with the database while maintaining a cached representation of the data in memory.
 
+.. _manager_model_pattern:
 The CachedDB_Manager and DB_Model classes work together to provide an efficient and object-oriented approach to database interactions:
 
     - The CachedDB_Manager subclass (e.g., Players) handles the retrieval and caching of multiple records.

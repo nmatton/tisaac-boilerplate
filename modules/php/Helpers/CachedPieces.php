@@ -41,7 +41,7 @@ class CachedPieces extends DB_Manager
   protected static $autoreshuffleCustom = [];
   protected static $customFields = [];
   protected static $gIndex = [];
-  protected static $datas = null;
+  protected static $datas = null; // The cache that stores all the pieces data after the first fetch.
 
   public static function DB($table = null)
   {
@@ -455,7 +455,7 @@ class CachedPieces extends DB_Manager
     if (static::$autoreshuffleListener) {
       $obj = static::$autoreshuffleListener['obj'];
       $method = static::$autoreshuffleListener['method'];
-      $obj->$method($fromLocation);
+      $obj->$method($fromLocation); // might need to be fixed by $obj::$method($fromLocation) or using call_user_func(static::$autoreshuffleListener, $fromLocation); Latter needs to update the definition of autoreshuffleListener property
     }
   }
 
