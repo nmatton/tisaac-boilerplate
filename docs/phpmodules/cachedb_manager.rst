@@ -4,6 +4,7 @@ CachedDB_Manager & DB_Model Modules
 The CachedDB_Manager and DB_Model classes are designed to provide an efficient and convenient way to interact with the database while maintaining a cached representation of the data in memory.
 
 .. _manager_model_pattern:
+
 The CachedDB_Manager and DB_Model classes work together to provide an efficient and object-oriented approach to database interactions:
 
     - The CachedDB_Manager subclass (e.g., Players) handles the retrieval and caching of multiple records.
@@ -71,6 +72,8 @@ This way, every time the manager retrieves data from the database, it will autom
 Under the hood, this is the method that is passed to the "cast" method of the QueryBuilder constructor (:hoverxref:`see QueryBuilder usage <qb_cast>`)
 
 We will see in more details why :code:`return new \FOO\Models\Player($row);` is used in the section about the DB_Model class.
+
+.. _manager_getUiData:
 
 Managers will also implements in many case a :code:`getUiData()` method that will return an array of data that can be used to represent the object in the UI.
 This method is typically usefull to construct the array that is returned by getAllDatas() or when you need to get the UI data in a notification.

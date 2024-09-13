@@ -4,6 +4,7 @@ CachedPieces
 :Qualified name: ``FOO\Helpers\CachedPieces``
 :Extends: :class:`DB_Manager`
 
+.. php:namespace:: FOO\Helpers\CachedPieces
 .. php:class:: CachedPieces
 
   .. php:staticmethod:: public static DB ([])
@@ -11,9 +12,9 @@ CachedPieces
     :param $table:
       Default: ``null``
 
-  .. php:staticmethod:: public static checkId (& $id[, $like])
+  .. php:staticmethod:: public static checkId (&$id[, $like])
 
-    :param & $id:
+    :param &$id:
     :param $like:
       Default: ``false``
 
@@ -21,9 +22,9 @@ CachedPieces
 
     :param $arr:
 
-  .. php:staticmethod:: public static checkLocation (& $location[, $like])
+  .. php:staticmethod:: public static checkLocation (&$location[, $like])
 
-    :param & $location:
+    :param &$location:
     :param $like:
       Default: ``false``
 
@@ -46,7 +47,7 @@ CachedPieces
       Default: ``null``
     :returns: int -- The number of items in the specified location.
 
-  .. php:staticmethod:: public static create ($pieces[, $globalLocation, $globalState, $globalId])
+  .. php:method:: public static create ($pieces[, $globalLocation, $globalState, $globalId])
 
     :param $pieces:
     :param $globalLocation:

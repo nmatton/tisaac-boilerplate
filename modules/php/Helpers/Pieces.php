@@ -314,7 +314,7 @@ class Pieces extends DB_Manager
    * @param int $id The ID of the state to retrieve.
    * @return mixed The state corresponding to the given ID.
    */
-  public static function getState($id)
+  public static function getState(int $id)
   {
     $res = self::get($id);
     return is_null($res) ? null : $res[(static::$autoremovePrefix ? '' : static::$prefix) . 'state'];
