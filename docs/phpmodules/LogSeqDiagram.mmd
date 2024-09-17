@@ -1,0 +1,112 @@
+sequenceDiagram
+    autonumber
+    participant SM as State Machine
+    participant G as Game
+    participant T as ConfirmUndoTrait
+    participant L as Log
+    participant M as DB_Manager
+    participant DB as QueryBuilder / Database
+    participant N as Notification
+    participant P as Player
+    participant UI as User Interface
+
+    Note over SM: entering "NextPlayer" state ("game" state)
+    SM ->> G: stNextPlayer()
+    activate G
+    G->>T: addCheckpoint()
+    activate T
+    T->>L: checkpoint()
+    deactivate T
+    activate L
+    L-->>L:addEntry()
+    L-->>DB: insert Log data
+    DB-->>L: Checkpoint added
+    deactivate L
+    G->>SM: nextState('PlayerTurn')
+    deactivate G
+    Note over SM: entering "PlayerTurn" state ("activeplayer" state)
+    SM ->> G: stPlayerTurn() & argPlayerTurn()
+
+    P->>UI: Takes an action
+    activate UI
+    UI->>G: actX()
+    deactivate UI
+    activate G
+    G->>T: addStep()
+    activate T
+    T->>L:step()
+    activate L
+    L-->>L:addEntry()
+    deactivate L
+    T->>N:newUndoableStep($player_id, $stepId)
+    activate N
+    deactivate T
+    N->>UI:newUndoableStep(stepId, preserve=true)
+    deactivate N
+    G->>M: DB updates
+    activate M
+    M->>DB: update data
+    M->>L: addEntry() -> log DB updates
+    deactivate M
+    G-->>N: game related notifs
+    G->>SM: nextstate('confirmChoices')
+    deactivate G
+    SM->>G: stConfirmChoices() & argConfirmChoices()
+
+    activate G
+    G->>SM: nextstate('confirmTurn')
+    deactivate G
+    SM->> T: stConfirmTurn() & argConfirmTurn()
+    activate T
+    T->>L: getUndoableSteps()
+    activate L
+    L-->>L: getLastCheckpoint()
+    activate L
+    L-->>DB: fetch the highest "stepId" where "type"=="checkpoint"
+    activate DB
+    DB-->>L: stepId of last checkpoint = chekpointId
+    deactivate DB
+    L-->>DB:  fetch all "stepId" > "chekpointId" where "type"=="step"
+    activate DB
+    DB-->>L: list of stepIds with type = "step" and id > lastCheckpointId
+    deactivate DB
+    L->>T: list of undoableSteps
+    deactivate L
+    deactivate L
+    T->>UI: list of possible undoable steps
+    deactivate T
+    Note over UI: Display "Confirm", "Undo Last Step" and "Restart Turn" buttons
+    alt Player confirms
+        P->>UI: Click "Confirm"
+        UI->>G: actConfirmTurn()
+        G->>SM: Move to next state
+    else Player Undo one step
+        P->>UI: Click "Undo Last step"
+        UI->>T: actUndoToStep(stepId)
+        activate T
+        T->>L: undoToStep(stepId)
+        deactivate T
+        activate L
+        L->>DB: check if stepId is undoable
+        L-->>L: revertTo()
+        activate L
+        L-->>DB: apply undo changes
+        L->>N: clearTurn(player_id, [notifs_ids])
+        N->>UI: clearTurn #59; clean the game log (history) from undone moves
+        L->>G: getAllDatas()
+        activate G
+        G->>L: array of datas
+        deactivate G
+        L->>N: refreshUI()
+        N->>UI: refreshUI()
+        activate UI
+        UI-->>UI: Update interface (destroy elements, update counters, etc.)
+        deactivate UI
+        deactivate L
+        deactivate L
+    else Player restarts turn
+        Note over L: Similar as "Undo one step"
+    end
+
+
+

@@ -176,12 +176,142 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      */
     onEnteringState(stateName, args) {
       debug('Entering state: ' + stateName, args);
-      if (this.isFastMode()) return;
-      if (this._activeStates.includes(stateName) && !this.isCurrentPlayerActive()) return;
+      if (this.isFastMode() && ![].includes(stateName)) return;
+
+      if (args.args && args.args.descSuffix) {
+        this.changePageTitle(args.args.descSuffix);
+      }
+
+      if (args.args && args.args.optionalAction) {
+        let base = args.args.descSuffix ? args.args.descSuffix : '';
+        this.changePageTitle(base + 'skippable');
+      }
+
+      if (!this._inactiveStates.includes(stateName) && !this.isCurrentPlayerActive()) return;
+
+      // Undo last steps
+      if (args.args && args.args.previousSteps) {
+        args.args.previousSteps.forEach((stepId) => {
+          let logEntry = $('logs').querySelector(`.log.notif_newUndoableStep[data-step="${stepId}"]`);
+          if (logEntry) this.onClick(logEntry, () => this.undoToStep(stepId));
+
+          logEntry = document.querySelector(`.chatwindowlogs_zone .log.notif_newUndoableStep[data-step="${stepId}"]`);
+          if (logEntry) this.onClick(logEntry, () => this.undoToStep(stepId));
+        });
+      }
+
+      // Restart turn button
+      if (args.args && args.args.previousChoices && args.args.previousChoices >= 1 && !args.args.automaticAction) {
+        if (args.args && args.args.previousSteps) {
+          let lastStep = Math.max(...args.args.previousSteps);
+          if (lastStep > 0)
+            this.addDangerActionButton(
+              'btnUndoLastStep',
+              _('Undo last step'),
+              () => this.undoToStep(lastStep),
+              'restartAction',
+            );
+        }
+
+        // Restart whole turn
+        this.addDangerActionButton(
+          'btnRestartTurn',
+          _('Restart turn'),
+          () => {
+            this.stopActionTimer();
+            this.takeAction('actRestart');
+          },
+          'restartAction',
+        );
+      }
 
       // Call appropriate method
       var methodName = 'onEnteringState' + stateName.charAt(0).toUpperCase() + stateName.slice(1);
       if (this[methodName] !== undefined) this[methodName](args.args);
+    },
+
+    onAddingNewUndoableStepToLog(notif) {
+      if (!$(`log_${notif.logId}`)) return;
+      let stepId = notif.msg.args.stepId;
+      $(`log_${notif.logId}`).dataset.step = stepId;
+      if ($(`dockedlog_${notif.mobileLogId}`)) $(`dockedlog_${notif.mobileLogId}`).dataset.step = stepId;
+
+      if (
+        this.gamedatas &&
+        this.gamedatas.gamestate &&
+        this.gamedatas.gamestate.args &&
+        this.gamedatas.gamestate.args.previousSteps &&
+        this.gamedatas.gamestate.args.previousSteps.includes(parseInt(stepId))
+      ) {
+        this.onClick($(`log_${notif.logId}`), () => this.undoToStep(stepId));
+
+        if ($(`dockedlog_${notif.mobileLogId}`))
+          this.onClick($(`dockedlog_${notif.mobileLogId}`), () => this.undoToStep(stepId));
+      }
+    },
+
+    onEnteringStateConfirmTurn(args) {
+      this.addPrimaryActionButton('btnConfirmTurn', _('Confirm'), () => {
+        this.stopActionTimer();
+        this.takeAction('actConfirmTurn');
+      });
+
+      const OPTION_CONFIRM = 103;
+      let n = args.previousChoices;
+      let timer = Math.min(10 + 2 * n, 20);
+      this.startActionTimer('btnConfirmTurn', timer, this.prefs[OPTION_CONFIRM].value);
+    },
+
+    undoToStep(stepId) {
+      this.stopActionTimer();
+      this.checkAction('actRestart');
+      this.takeAction('actUndoToStep', { stepId }, false);
+    },
+
+    notif_clearTurn(n) {
+      debug('Notif: restarting turn', n);
+      this.cancelLogs(n.args.notifIds);
+    },
+
+    notif_refreshUI(n) {
+      debug('Notif: refreshing UI', n);
+      ['meeples', 'players', 'cards', 'tiles'].forEach((value) => {
+        // update the array to your needs
+        this.gamedatas[value] = n.args.datas[value];
+      });
+
+      // call the setup function to update the UI
+      //this.setupCards();
+      //this.setupMeeples();
+      //this.setupTiles();
+
+      // destroy potential element added to the DOM with previous undone steps
+      if (this.gamedatas.optionCardsVisibility == 0) {
+        document.querySelectorAll('.completed-orders .foo-card.back-card').forEach((oCard) => {
+          this.destroy(oCard);
+        });
+      }
+
+      // reset counters and other player specific UI elements
+      this.forEachPlayer((player) => {
+        let pId = player.id;
+        this.scoreCtrl[pId].toValue(player.score);
+        /*
+        this._counters[pId].worker.toValue(player.workers);
+        this._counters[pId].money.toValue(player.money);
+
+        $(`playerpanel-${player.id}`).dataset.y = player.resLevel;
+
+        if (this.gamedatas.optionCardsVisibility == 0 && pId != this.player_id) {
+          for (let i = 0; i < player.ordersDone; i++) {
+            $(`completed-orders-${player.id}`).insertAdjacentHTML(
+              `beforeend`,
+              `<div class="coalbaron-card back-card"><div class="coalbaron-card-inner"></div></div>`,
+            );
+          }
+        }
+        */
+      });
     },
 
     /**

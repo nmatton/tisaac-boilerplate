@@ -132,7 +132,7 @@ class Notifications
   }
   public static function refreshUI($datas)
   {
-    // // Keep only the thing that matters
+    // Keep only the thing that matters
     $fDatas = [
       'players' => $datas['players'],
       'factions' => $datas['factions'],
@@ -141,6 +141,7 @@ class Notifications
       'controlledResources' => $datas['controlledResources'],
       'scores' => $datas['scores'],
       'combatHex' => $datas['combatHex'],
+      // ...
     ];
 
     self::notifyAll('refreshUI', '', [

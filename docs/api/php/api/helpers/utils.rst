@@ -1,6 +1,8 @@
 Utils
 =====
 
+.. _api-php-helpers-utils:
+
 :Qualified name: ``FOO\Helpers\Utils``
 
 .. php:class:: Utils
@@ -63,6 +65,7 @@ This class provides a set of utility methods that can be used for various purpos
   .. php:method:: public static resourcesToStr ($resources[, $keepZero]) -> string
 
     Converts an array of resources to a string representation to be displayed in the UI.
+
 The format of the string is as follows:
 
 

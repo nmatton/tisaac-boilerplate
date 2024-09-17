@@ -67,7 +67,31 @@ $machinestates = [
     'descriptionmyturn' => clienttranslate('${you} must play a card or pass'),
     'type' => 'activeplayer',
     'possibleactions' => ['actPlayCard', 'actPpass'],
-    'transitions' => ['done' => ST_FOO],
+    'transitions' => ['done' => ST_CONFIRM_CHOICES],
+  ],
+
+  ST_CONFIRM_CHOICES => [
+    'name' => 'confirmChoices',
+    'description' => '',
+    'type' => 'game',
+    'action' => 'stConfirmChoices',
+    'transitions' => [
+      '' => ST_CONFIRM_TURN,
+    ],
+  ],
+
+  ST_CONFIRM_TURN => [
+    'name' => 'confirmTurn',
+    'description' => clienttranslate('${actplayer} must confirm or restart their turn'),
+    'descriptionmyturn' => clienttranslate('${you} must confirm or restart your turn'),
+    'type' => 'activeplayer',
+    'args' => 'argsConfirmTurn',
+    'action' => 'stConfirmTurn',
+    'possibleactions' => ['actConfirmTurn', 'actRestart'],
+    'transitions' => [
+      'confirm' => ST_NEXT_PLAYER,
+      'zombiePass' => ST_NEXT_PLAYER,
+    ],
   ],
 
   // Final state.

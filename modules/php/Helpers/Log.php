@@ -67,10 +67,14 @@ class Log extends \APP_DbObject
    * 
    * @return int
    */
-  public function checkpoint()
+  public static function checkpoint($state = null)
   {
     self::clearUndoableStepNotifications();
-    return self::addEntry(['type' => 'checkpoint']);
+    $entry = ['type' => 'checkpoint'];
+    if (isset($state)) {
+      $entry['affected'] = $state;
+    }
+    return self::addEntry($entry);
   }
 
   /**
@@ -78,16 +82,20 @@ class Log extends \APP_DbObject
    *
    * @return int
    */
-  public function step()
+  public static function step($state)
   {
-    return self::addEntry(['type' => 'step']);
+    $entry = ['type' => 'step'];
+    if (isset($state)) {
+      $entry['affected'] = $state;
+    }
+    return self::addEntry($entry);
   }
 
   /**
    * Log the start of engine to allow "restart turn"
    * 
    */
-  public function startEngine()
+  public static function startEngine()
   {
     if (!Globals::isSolo()) {
       self::checkpoint();
@@ -102,7 +110,7 @@ class Log extends \APP_DbObject
    * @param bool $includeEngineStarts (optional) Whether to include engine starts in the result. Default is false.
    * @return mixed The last checkpoint.
    */
-  public function getLastCheckpoint($includeEngineStarts = false)
+  public static function getLastCheckpoint($includeEngineStarts = false)
   {
     $query = new QueryBuilder('log', null, 'id');
     $query = $query->select(['id']);
@@ -127,7 +135,7 @@ class Log extends \APP_DbObject
    * @param bool $onlyIds Determines whether to return only the step IDs (true) or the steps themselves (false). Default is true.
    * @return mixed Returns the undoable steps or their IDs based on the $onlyIds parameter.
    */
-  public function getUndoableSteps($onlyIds = true)
+  public static function getUndoableSteps($onlyIds = true)
   {
     $checkpoint = self::getLastCheckpoint();
     $query = new QueryBuilder('log', null, 'id');
@@ -143,7 +151,7 @@ class Log extends \APP_DbObject
   /**
    * Revert all the way to the last checkpoint or the last start of turn
    */
-  public function undoTurn()
+  public static function undoTurn()
   {
     $checkpoint = static::getLastCheckpoint(true);
     return self::revertTo($checkpoint);
@@ -152,7 +160,7 @@ class Log extends \APP_DbObject
   /**
    * Revert to a given step (checking first that it exists)
    */
-  public function undoToStep($stepId)
+  public static function undoToStep($stepId)
   {
     $query = new QueryBuilder('log', null, 'id');
     $step = $query
@@ -169,7 +177,7 @@ class Log extends \APP_DbObject
   /**
    * Revert all the logged changes up to an id
    */
-  public function revertTo($id)
+  public static function revertTo($id)
   {
     $query = new QueryBuilder('log', null, 'id');
     $logs = $query
@@ -267,7 +275,7 @@ class Log extends \APP_DbObject
    * @param array $notifications The notifications to extract IDs from.
    * @return array The extracted notification IDs.
    */
-  protected function extractNotifIds($notifications)
+  protected static function extractNotifIds($notifications)
   {
     $notificationUIds = [];
     foreach ($notifications as $packet) {
@@ -284,7 +292,7 @@ class Log extends \APP_DbObject
    * 
    * @return array The notification IDs of the cancelled notifications.
    */
-  public function getCanceledNotifIds()
+  public static function getCanceledNotifIds()
   {
     $query = new QueryBuilder('gamelog', null, 'gamelog_packet_id');
     return self::extractNotifIds($query->where('cancel', 1)->get());
@@ -296,7 +304,7 @@ class Log extends \APP_DbObject
    * @param bool $clearAll (optional) Whether to clear all undoable step notifications. Default is false.
    * @return void
    */
-  public function clearUndoableStepNotifications($clearAll = false)
+  public static function clearUndoableStepNotifications($clearAll = false)
   {
     // Get move ids corresponding to last step
     if ($clearAll) {

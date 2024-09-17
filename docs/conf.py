@@ -29,10 +29,12 @@ extensions = [
     'hoverxref',
     'sphinx_rtd_theme',
     'sphinxcontrib.phpdomain',
-    'sphinx_js']
+    'sphinx_js',
+    'sphinxcontrib.mermaid']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+# toc_object_entries = False
 
 # Make sure the target is unique
 autosectionlabel_prefix_document = True
