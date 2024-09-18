@@ -311,7 +311,7 @@ Taking actions
 Taking action is wrapped to check if interface is locked before calling the ``bgaPerformAction`` method.
 General practise is to use ``takeAction(action: string, data?: object, check: bool = true, checkLock:bool = true)``
 
-By default, a custom div is used to add buttons to avoid being removed when ``onUpdateActionButtons`` is called. A wrapper is also implemented in that way and you can use ``addSecondaryActionButton`` and ``addDangerActionButton`` to add secondary (gray) and danger (red) buttons.
+By default, a custom div is used to add buttons to avoid being removed when ``onUpdateActionButtons`` is called. A wrapper is also implemented in that way and you can use ``addPrimaryActionButton``, ``addSecondaryActionButton`` and ``addDangerActionButton`` to add primary (blue), secondary (gray) and danger (red) buttons.
 
 Additionally, you can also add a timer to (confirm) buttons using ``startActionTimer(buttonId, time, pref, autoclick = false)``. It is linked to user preference (no confirm button, with or without timer).
 And you can stop the running timers with ``stopActionTimer()``
