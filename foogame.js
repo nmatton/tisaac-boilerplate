@@ -32,6 +32,9 @@ define([
     constructor() {
       this._activeStates = [];
       this._notifications = [
+        ['mediumMessage', 1200],
+        ['clearTurn', 200],
+        ['refreshUI', 200],
         //['revealActionCard', 1100],
       ];
 

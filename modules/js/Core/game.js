@@ -141,18 +141,26 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     /**
      * Make an AJAX call with automatic lock
      */
-    takeAction(action, data, check = true, checkLock = true) {
-      if (check && !this.checkAction(action)) return false;
+    takeAction(action, data = null, check = true, checkLock = true) {
       if (!check && checkLock && !this.checkLock()) return false;
       // Stop any ongoing timed button
       this.stopActionTimer();
 
-      data = data || {};
-      if (data.lock === undefined) {
-        data.lock = true;
-      } else if (data.lock === false) {
-        delete data.lock;
+      args = data || {};
+      options = {};
+      if (args.lock === undefined) {
+        options.lock = true;
+      } else if (args.lock === false) {
+        options.lock = false;
+        delete args.lock;
       }
+      if (!check) {
+        options.checkAction = false;
+      }
+      return this.bgaPerformAction(action, args, options).catch((isError, message, code) => {
+        if (isError) reject(message, code);
+      });
+      /* Old way - legacy in BGA framework
       return new Promise((resolve, reject) => {
         this.ajaxcall(
           '/' + this.game_name + '/' + this.game_name + '/' + action + '.html',
@@ -163,7 +171,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
             if (isError) reject(message, code);
           },
         );
-      });
+      }); */
     },
 
     /**
