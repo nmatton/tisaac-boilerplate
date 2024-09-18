@@ -26,7 +26,7 @@ The **JavaScript** module primarily consists of the ``Core`` and ``Player`` modu
 The ``Core`` module contains essential functions for the frontend, including basic animations, helper functions, and more. 
 The ``Player`` module offers functions to interact with player data, such as retrieving the player's color, name, and managing player-specific templates.
 
-The **PHP** module includes ``Helpers``, ``QueryBuilder``, ``Collection``, and other modules that enhance efficiency and clarity in implementation. 
+The **PHP** module includes ``Helpers``, ``QueryBuilder``, ``DB_Managers``, ``DB_Models``, and other modules that enhance efficiency and clarity in implementation. 
 This is the more advanced part of the boilerplate, designed to help better structure your code and simplify game development in various aspects.
 
 Some **CLI** tools are also included such as scripts to work at multiple developpers on the same project.
@@ -34,7 +34,7 @@ Some **CLI** tools are also included such as scripts to work at multiple develop
 Where to Start?
 ===============
 
-The best place to start is by reading the `quickstart <quickstart.html>`_ guide, which will introduce you to the basic concepts of the boilerplate and how to use it. 
+The best place to start is by reading the `quickstart <quickstart.html>`_ page, which will introduce you to the basic concepts of the boilerplate and how to use it. 
 The `overview <overview.html>`_ will provide a general understanding of the boilerplate, its components, and how they are organized.
 Finally, the `tutorial <tutorial.html>`_ section will walk you through the implementation of a simple game using the boilerplate.
 

@@ -10,7 +10,9 @@ from pygments.lexers.web import PhpLexer
 from sphinx.highlighting import lexers
 import os
 import sys
-sys.path.insert(0, os.path.abspath('./hoverxref'))
+sys.path.insert(0, os.path.join(os.path.dirname(
+    os.path.abspath(__file__)), 'hoverxref'))
+# sys.path.insert(0, os.path.abspath('./hoverxref'))
 
 project = "Tisaac's boilerplate"
 copyright = '2024, Tisaac, nicotacotac, other(s)'
